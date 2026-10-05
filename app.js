@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // ==========================================================
   // 1. API CONFIGURATION & REUSABLE HEADERS (Step 7)
   // ==========================================================
-  const API_URL = "/api/v1";
+  const API_URL = "https://l-lawliet-three.vercel.app/api/v1";
   const API_KEY = "student-api-key-123";
 
   const FETCH_OPTIONS = {
@@ -10,7 +10,6 @@ document.addEventListener("DOMContentLoaded", () => {
       "x-api-key": API_KEY
     }
   };
-
   // DOM Elements
   const lawsGrid = document.getElementById("lawsGrid");
   const searchInput = document.getElementById("searchInput");
