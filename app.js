@@ -2,14 +2,15 @@ document.addEventListener("DOMContentLoaded", () => {
   // ==========================================================
   // 1. API CONFIGURATION & REUSABLE HEADERS (Step 7)
   // ==========================================================
-  const API_URL = "https://l-lawliet-three.vercel.app/api/v1";
-  const API_KEY = "student-api-key-123";
+const API_URL = "https://l-lawliet-three.vercel.app/api/v1"; 
+const API_KEY = "student-api-key-123";
 
-  const FETCH_OPTIONS = {
-    headers: {
-      "x-api-key": API_KEY
-    }
-  };
+const FETCH_OPTIONS = {
+  headers: {
+    "x-api-key": API_KEY,
+    "Content-Type": "application/json"
+  }
+};
   // DOM Elements
   const lawsGrid = document.getElementById("lawsGrid");
   const searchInput = document.getElementById("searchInput");
@@ -25,28 +26,28 @@ document.addEventListener("DOMContentLoaded", () => {
   // ==========================================================
   // 2. FETCH LAWS (AUTHENTICATED)
   // ==========================================================
-  async function fetchLaws() {
-    try {
-      const response = await fetch(`${API_URL}/laws`, FETCH_OPTIONS);
-      if (!response.ok) {
-        throw new Error(`Server returned HTTP ${response.status}`);
-      }
+async function fetchLaws() {
+  try {
+    const response = await fetch(`${API_URL}/laws`, FETCH_OPTIONS);
+    if (!response.ok) {
+      throw new Error(`Server returned HTTP ${response.status}`);
+    }
 
-      const result = await response.json();
+    const result = await response.json();
 
-      // Handles both { count, laws: [...] } and direct array [...]
-      allLaws = Array.isArray(result) ? result : (result.laws || []);
+    // Handles both { count, laws: [...] } and direct array [...]
+    allLaws = Array.isArray(result) ? result : (result.laws || []);
 
-      // Limit to first 5 laws on the home page
-      const top5Laws = allLaws.slice(0, 5);
-      displayLaws(top5Laws);
-    } catch (error) {
-      console.error("Error fetching laws:", error);
-      if (lawsGrid) {
-        lawsGrid.innerHTML = `<p style="color: var(--text-muted);">Failed to load laws from the backend.</p>`;
-      }
+    // Limit to first 5 laws on the home page
+    const top5Laws = allLaws.slice(0, 5);
+    displayLaws(top5Laws);
+  } catch (error) {
+    console.error("Error fetching laws:", error);
+    if (lawsGrid) {
+      lawsGrid.innerHTML = `<p style="color: var(--text-muted);">Failed to load laws from the backend.</p>`;
     }
   }
+}
 
   // ==========================================================
   // 3. RENDER LAWS INTO GRID
