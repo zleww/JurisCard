@@ -579,10 +579,13 @@
         });
       }
 
+// 1. Point directly to your primary L-Lawliet live backend
+      const BASE_API_URL = "https://l-lawliet-three.vercel.app/api/v1";
+
       // 2. Fetch laws from FastAPI backend
       async function fetchLaws() {
         try {
-          const response = await fetch('/api/v1/laws', {
+          const response = await fetch(`${BASE_API_URL}/laws`, {
             headers: { 'x-api-key': API_KEY }
           });
 
