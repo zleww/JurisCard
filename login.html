@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign in | JurisCards</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="juris.css">
+  <style>
+    .auth-wrap { display: grid; grid-template-columns: 1.1fr 1fr; gap: 40px; align-items: start; padding-top: 50px; }
+    .auth-side h1 { font-size: clamp(32px, 4vw, 44px); line-height: 1.15; margin-bottom: 14px; }
+    .auth-side p { color: var(--muted); font-size: 15px; margin-bottom: 20px; }
+    .compare { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid var(--line); font-size: 13.5px; }
+    .compare th, .compare td { padding: 10px 14px; border-bottom: 1px solid #ece9e2; text-align: left; }
+    .compare th { font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: #7b858d; }
+    .compare td:not(:first-child) { white-space: nowrap; }
+    .tabs { display: flex; border-bottom: 1px solid var(--line); margin-bottom: 22px; }
+    .tabs button {
+      flex: 1; padding: 12px; background: none; border: 0; border-bottom: 2px solid transparent;
+      font: inherit; font-size: 14px; font-weight: 600; color: var(--muted); cursor: pointer;
+    }
+    .tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--gold); }
+    .or { display: flex; align-items: center; gap: 12px; color: #9aa2aa; font-size: 12px; margin: 18px 0; }
+    .or::before, .or::after { content: ""; flex: 1; border-top: 1px solid var(--line); }
+    .notice { background: #fbf6ea; border: 1px solid #e6d5ad; padding: 10px 14px; font-size: 13.5px; margin-bottom: 18px; }
+    .guest-link { display: block; text-align: center; margin-top: 18px; font-size: 13.5px; color: var(--muted); text-decoration: underline !important; }
+    @media (max-width: 860px) { .auth-wrap { grid-template-columns: 1fr; padding-top: 30px; } .auth-side { order: 2; } }
+  </style>
+</head>
+<body class="jc-page">
+  <header>
+    <div class="container navbar">
+      <a href="index.html" class="logo"><span class="logo-mark">J</span>JurisCards</a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="browse.html">Browse</a>
+        <a href="flashcard.html">Flashcards</a>
+        <a href="review.html">Review</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container auth-wrap">
+      <section class="auth-side">
+        <div class="jc-eyebrow">Account</div>
+        <h1>Sign in to save your progress.</h1>
+        <p>JurisCards and L-Lawliet share one database, so the account you made on either site works on both.</p>
+        <table class="compare">
+          <thead><tr><th></th><th>Guest</th><th>Account</th></tr></thead>
+          <tbody>
+            <tr><td>Laws you can read and study</td><td>10</td><td>All</td></tr>
+            <tr><td>Practice quiz length</td><td>5 questions</td><td>5 to 20</td></tr>
+            <tr><td>Card marks and quiz scores</td><td>Lost on close</td><td>Saved</td></tr>
+            <tr><td>Write your own cards</td><td>No</td><td>Yes</td></tr>
+            <tr><td>Post notes on laws</td><td>Read only</td><td>Yes</td></tr>
+            <tr><td>Review page and profile</td><td>No</td><td>Yes</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="jc-panel">
+        <div id="notice" class="notice" hidden></div>
+
+        <div class="tabs" role="tablist">
+          <button id="tabLogin" role="tab" aria-selected="true" aria-controls="loginForm">Sign in</button>
+          <button id="tabSignup" role="tab" aria-selected="false" aria-controls="signupForm">Create account</button>
+        </div>
+
+        <form id="loginForm" novalidate>
+          <div class="jc-field">
+            <label for="username">Username</label>
+            <input id="username" name="username" autocomplete="username" required maxlength="50">
+          </div>
+          <div class="jc-field">
+            <label for="password">Password</label>
+            <input id="password" name="password" type="password" autocomplete="current-password" required maxlength="200">
+          </div>
+          <button class="jc-btn wide" id="loginBtn" type="submit">Sign in</button>
+          <p class="jc-msg err" id="loginError" role="alert"></p>
+        </form>
+
+        <form id="signupForm" novalidate hidden>
+          <div class="jc-field">
+            <label for="newUsername">Username</label>
+            <input id="newUsername" name="username" autocomplete="username" required minlength="3" maxlength="30" pattern="[A-Za-z0-9_.]+">
+            <p class="jc-hint">3 to 30 letters, numbers, dots or underscores.</p>
+          </div>
+          <div class="jc-field">
+            <label for="displayName">Display name (optional)</label>
+            <input id="displayName" name="display_name" autocomplete="name" maxlength="100">
+            <p class="jc-hint">Shown on your notes and in the header.</p>
+          </div>
+          <div class="jc-field">
+            <label for="newPassword">Password</label>
+            <input id="newPassword" type="password" autocomplete="new-password" required minlength="8" maxlength="72">
+            <p class="jc-hint">At least 8 characters, with a letter and a number.</p>
+          </div>
+          <div class="jc-field">
+            <label for="newPassword2">Confirm password</label>
+            <input id="newPassword2" type="password" autocomplete="new-password" required>
+          </div>
+          <button class="jc-btn gold wide" id="signupBtn" type="submit">Create account</button>
+          <p class="jc-msg err" id="signupError" role="alert"></p>
+        </form>
+
+        <div id="googleBox" hidden>
+          <div class="or">or</div>
+          <div id="googleBtn" style="display: flex; justify-content: center; min-height: 44px;"></div>
+          <p class="jc-msg err" id="googleError" role="alert" style="text-align: center;"></p>
+        </div>
+
+        <a class="guest-link" id="guestLink" href="index.html">Continue as a guest</a>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container footer-content">
+      <div class="footer-logo"><span class="logo-mark">J</span> JurisCards</div>
+      <div>Law data from the L-Lawliet database &middot; &copy; 2026 JurisCards</div>
+    </div>
+  </footer>
+
+  <script src="juris.js"></script>
+  <script>
+  (function () {
+      const { API, saveSession, getAuth, errorMessage } = Juris;
+      const $ = id => document.getElementById(id);
+      const params = new URLSearchParams(location.search);
+
+      // Only go back to one of this site's own pages after signing in.
+      const nextParam = params.get("next") || "";
+      const next = /^[a-z-]+\.html(\?[^#]*)?(#[a-z]+)?$/i.test(nextParam) && !nextParam.startsWith("login.html")
+          ? nextParam : "start-review.html";
+      $("guestLink").href = /^login/.test(next) ? "index.html" : next;
+
+      function done(data) {
+          saveSession(data);
+          location.href = next;
+      }
+
+      if (getAuth() && !params.get("expired")) { location.href = next; return; }
+
+      if (params.get("expired")) {
+          $("notice").textContent = "Your session ended. Please sign in again.";
+          $("notice").hidden = false;
+      }
+
+      // ---------- Tabs ----------
+      function show(tab) {
+          const login = tab === "login";
+          $("tabLogin").setAttribute("aria-selected", String(login));
+          $("tabSignup").setAttribute("aria-selected", String(!login));
+          $("loginForm").hidden = !login;
+          $("signupForm").hidden = login;
+          (login ? $("username") : $("newUsername")).focus();
+      }
+      $("tabLogin").addEventListener("click", () => show("login"));
+      $("tabSignup").addEventListener("click", () => show("signup"));
+      if (params.get("signup")) show("signup");
+
+      async function send(path, body, btn, errorBox) {
+          errorBox.textContent = "";
+          btn.disabled = true;
+          try {
+              const res = await fetch(API + path, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(body),
+              });
+              if (!res.ok) { errorBox.textContent = await errorMessage(res); return; }
+              done(await res.json());
+          } catch {
+              errorBox.textContent = "Could not reach the server. Please try again.";
+          } finally {
+              btn.disabled = false;
+          }
+      }
+
+      $("loginForm").addEventListener("submit", e => {
+          e.preventDefault();
+          const username = $("username").value.trim();
+          const password = $("password").value;
+          if (!username || !password) { $("loginError").textContent = "Enter your username and password."; return; }
+          send("/auth/login", { username, password }, $("loginBtn"), $("loginError"));
+      });
+
+      $("signupForm").addEventListener("submit", e => {
+          e.preventDefault();
+          const box = $("signupError");
+          const username = $("newUsername").value.trim();
+          const password = $("newPassword").value;
+          if (!/^[A-Za-z0-9_.]{3,30}$/.test(username)) {
+              box.textContent = "Username must be 3 to 30 letters, numbers, dots or underscores.";
+              return;
+          }
+          if (password !== $("newPassword2").value) { box.textContent = "The passwords do not match."; return; }
+          const body = { username, password };
+          const name = $("displayName").value.trim();
+          if (name) body.display_name = name;
+          send("/auth/register", body, $("signupBtn"), box);
+      });
+
+      // ---------- Google (shown only when the API has a Google client ID) ----------
+      (async function setUpGoogle() {
+          let clientId = null;
+          try {
+              const res = await fetch(API + "/auth/config");
+              if (res.ok) clientId = (await res.json()).google_client_id;
+          } catch { /* button stays hidden */ }
+          if (!clientId) return;
+          const script = document.createElement("script");
+          script.src = "https://accounts.google.com/gsi/client";
+          script.async = true;
+          script.onload = () => {
+              google.accounts.id.initialize({ client_id: clientId, callback: onGoogle });
+              google.accounts.id.renderButton($("googleBtn"), { theme: "outline", size: "large", text: "continue_with", width: 300 });
+              $("googleBox").hidden = false;
+          };
+          document.head.appendChild(script);
+      })();
+
+      async function onGoogle(response) {
+          send("/auth/google", { credential: response.credential }, { disabled: false }, $("googleError"));
+      }
+  })();
+  </script>
+</body>
+</html>

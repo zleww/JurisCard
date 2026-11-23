@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings | JurisCards</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="juris.css">
+</head>
+<body class="jc-page">
+  <header>
+    <div class="container navbar">
+      <a href="index.html" class="logo"><span class="logo-mark">J</span>JurisCards</a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="browse.html">Browse</a>
+        <a href="flashcard.html">Flashcards</a>
+        <a href="review.html">Review</a>
+      </nav>
+      <div class="header-end"><div class="jc-account" data-account></div></div>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <section class="jc-heading">
+        <div class="jc-eyebrow">Settings</div>
+        <h1>Settings</h1>
+        <p id="accountLine">Loading</p>
+        <p class="jc-msg err" id="loadError" role="alert"></p>
+      </section>
+
+      <div class="jc-grid-2">
+        <div>
+          <form class="jc-panel" id="profileForm">
+            <h2>Profile</h2>
+            <p class="jc-sub">Your display name appears in the header and on notes you post. It is the same on L-Lawliet.</p>
+            <div class="jc-field">
+              <label for="displayName">Display name</label>
+              <input id="displayName" maxlength="100" autocomplete="name">
+            </div>
+            <div class="jc-field">
+              <label for="bio">Short bio</label>
+              <textarea id="bio" rows="3" maxlength="300" placeholder="e.g. 2nd year BS Criminology, reviewing for the board exam"></textarea>
+              <p class="jc-hint">Shown on your profile. Up to 300 characters.</p>
+            </div>
+            <button class="jc-btn" type="submit" id="profileBtn">Save profile</button>
+            <p class="jc-msg" id="profileMsg" role="status"></p>
+          </form>
+
+          <form class="jc-panel" id="studyForm">
+            <h2>Study</h2>
+            <p class="jc-sub">How the flashcards and quizzes work for you.</p>
+            <div class="jc-field">
+              <label for="quizLength">Default quiz length</label>
+              <select id="quizLength">
+                <option value="5">5 questions</option>
+                <option value="10">10 questions</option>
+                <option value="15">15 questions</option>
+                <option value="20">20 questions</option>
+              </select>
+            </div>
+            <div class="jc-field">
+              <label for="dailyGoal">Daily goal (cards marked per day)</label>
+              <input id="dailyGoal" type="number" min="1" max="100" required>
+            </div>
+            <label class="jc-check">
+              <input type="checkbox" id="hideMastered">
+              <span>Hide mastered cards when I open the flashcards</span>
+            </label>
+            <button class="jc-btn" type="submit" id="studyBtn">Save study settings</button>
+            <p class="jc-msg" id="studyMsg" role="status"></p>
+          </form>
+        </div>
+
+        <div>
+          <form class="jc-panel" id="passwordForm">
+            <h2>Password</h2>
+            <p class="jc-sub" id="passwordSub">Changing it signs you out on every other device.</p>
+            <input type="text" id="pwUsername" autocomplete="username" hidden>
+            <div id="passwordFields">
+              <div class="jc-field">
+                <label for="currentPassword">Current password</label>
+                <input id="currentPassword" type="password" autocomplete="current-password" required>
+              </div>
+              <div class="jc-field">
+                <label for="newPassword">New password</label>
+                <input id="newPassword" type="password" autocomplete="new-password" required minlength="8" maxlength="72">
+                <p class="jc-hint">At least 8 characters, with a letter and a number.</p>
+              </div>
+              <div class="jc-field">
+                <label for="newPassword2">Confirm new password</label>
+                <input id="newPassword2" type="password" autocomplete="new-password" required>
+              </div>
+              <button class="jc-btn" type="submit" id="passwordBtn">Change password</button>
+            </div>
+            <p class="jc-msg" id="passwordMsg" role="status"></p>
+          </form>
+
+          <section class="jc-panel">
+            <h2>Sessions</h2>
+            <p class="jc-sub">"Sign out everywhere" ends every session on every device, on both JurisCards and L-Lawliet.</p>
+            <div class="jc-row">
+              <button class="jc-btn plain" id="signOutBtn">Sign out</button>
+              <button class="jc-btn plain" id="signOutAllBtn">Sign out everywhere</button>
+            </div>
+            <p class="jc-msg" id="sessionMsg" role="status"></p>
+          </section>
+
+          <section class="jc-panel">
+            <h2>Reset progress</h2>
+            <p class="jc-sub">Clears every mastered and for-review mark. Your own cards and quiz history stay.</p>
+            <button class="jc-btn plain" id="resetBtn">Reset my marks</button>
+            <p class="jc-msg" id="resetMsg" role="status"></p>
+          </section>
+
+          <form class="jc-panel danger" id="deleteForm">
+            <h2>Delete account</h2>
+            <p class="jc-sub">This deletes your account on both sites, with your cards, marks and quiz history. Notes you posted stay on the laws as "Deleted user". It cannot be undone.</p>
+            <div class="jc-field">
+              <label for="deleteConfirm">Type your username (<strong id="deleteUsername"></strong>) to confirm</label>
+              <input id="deleteConfirm" autocomplete="off" required>
+            </div>
+            <div class="jc-field" id="deletePasswordField">
+              <label for="deletePassword">Password</label>
+              <input id="deletePassword" type="password" autocomplete="current-password">
+            </div>
+            <button class="jc-btn danger" type="submit" id="deleteBtn">Delete my account</button>
+            <p class="jc-msg" id="deleteMsg" role="status"></p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container footer-content">
+      <div class="footer-logo"><span class="logo-mark">J</span> JurisCards</div>
+      <div>Law data from the L-Lawliet database &middot; &copy; 2026 JurisCards</div>
+    </div>
+  </footer>
+
+  <script src="juris.js"></script>
+  <script>
+  (async function () {
+      const { requireLogin, getJson, api, errorMessage, saveSession, updateUser, signOut } = Juris;
+      if (!requireLogin()) return;
+      const $ = id => document.getElementById(id);
+
+      function say(id, text, ok) {
+          $(id).textContent = text;
+          $(id).className = "jc-msg " + (ok ? "ok" : "err");
+      }
+
+      // Send a form's request, show the result, keep the button disabled while waiting.
+      async function submit(btn, msgId, path, options, onOk) {
+          btn.disabled = true;
+          $(msgId).textContent = "";
+          try {
+              const res = await api(path, options);
+              if (!res.ok) { say(msgId, await errorMessage(res), false); return; }
+              await onOk(res);
+          } catch (err) {
+              if (err.message !== "Login expired") say(msgId, "Could not reach the server. Please try again.", false);
+          } finally {
+              btn.disabled = false;
+          }
+      }
+
+      let me, prefs;
+      try {
+          [me, prefs] = await Promise.all([getJson("/me"), getJson("/study/prefs")]);
+      } catch (err) {
+          $("accountLine").textContent = "";
+          $("loadError").textContent = err.message;
+          return;
+      }
+
+      $("accountLine").textContent = [`Signed in as @${me.username}`, me.email, me.role === "admin" && "admin"]
+          .filter(Boolean).join(" · ");
+      $("displayName").value = me.display_name || "";
+      $("bio").value = me.bio || "";
+      $("quizLength").value = String(prefs.quiz_length);
+      $("dailyGoal").value = prefs.daily_goal;
+      $("hideMastered").checked = prefs.hide_mastered;
+      $("deleteUsername").textContent = me.username;
+      $("pwUsername").value = me.username;
+      if (!me.has_password) {
+          $("passwordSub").textContent = "This account signs in with Google, so it has no password to change.";
+          $("passwordFields").hidden = true;
+          $("deletePasswordField").hidden = true;
+      }
+
+      // ---------- Profile ----------
+      $("profileForm").addEventListener("submit", e => {
+          e.preventDefault();
+          const name = $("displayName").value.trim();
+          if (!name) { say("profileMsg", "Display name cannot be empty.", false); return; }
+          submit($("profileBtn"), "profileMsg", "/me",
+              { method: "PATCH", body: { display_name: name, bio: $("bio").value.trim() } },
+              async res => {
+                  updateUser(await res.json());
+                  say("profileMsg", "Profile saved.", true);
+                  const slot = document.querySelector(".jc-menu-name");
+                  if (slot) slot.textContent = name;
+              });
+      });
+
+      // ---------- Study settings ----------
+      $("studyForm").addEventListener("submit", e => {
+          e.preventDefault();
+          const goal = Number($("dailyGoal").value);
+          if (!Number.isInteger(goal) || goal < 1 || goal > 100) {
+              say("studyMsg", "Daily goal must be a whole number from 1 to 100.", false);
+              return;
+          }
+          submit($("studyBtn"), "studyMsg", "/study/prefs", {
+              method: "PATCH",
+              body: { quiz_length: Number($("quizLength").value), daily_goal: goal, hide_mastered: $("hideMastered").checked },
+          }, async () => say("studyMsg", "Study settings saved.", true));
+      });
+
+      // ---------- Password ----------
+      $("passwordForm").addEventListener("submit", e => {
+          e.preventDefault();
+          if ($("newPassword").value !== $("newPassword2").value) {
+              say("passwordMsg", "The new passwords do not match.", false);
+              return;
+          }
+          submit($("passwordBtn"), "passwordMsg", "/me/password", {
+              method: "POST",
+              body: { current_password: $("currentPassword").value, new_password: $("newPassword").value },
+          }, async res => {
+              saveSession(await res.json());
+              $("passwordForm").reset();
+              say("passwordMsg", "Password changed. Other devices have been signed out.", true);
+          });
+      });
+
+      // ---------- Sessions ----------
+      $("signOutBtn").addEventListener("click", () => { signOut(); location.href = "index.html"; });
+      $("signOutAllBtn").addEventListener("click", () => {
+          if (!confirm("Sign out on every device, including this one?")) return;
+          submit($("signOutAllBtn"), "sessionMsg", "/auth/logout-all", { method: "POST" }, async () => {
+              signOut();
+              location.href = "login.html";
+          });
+      });
+
+      // ---------- Reset ----------
+      $("resetBtn").addEventListener("click", () => {
+          if (!confirm("Clear all your mastered and for-review marks? Your own cards and quiz history are kept.")) return;
+          submit($("resetBtn"), "resetMsg", "/study/progress", { method: "DELETE" }, async res => {
+              const { cleared } = await res.json();
+              say("resetMsg", `Cleared ${cleared} mark${cleared === 1 ? "" : "s"}.`, true);
+          });
+      });
+
+      // ---------- Delete ----------
+      $("deleteForm").addEventListener("submit", e => {
+          e.preventDefault();
+          if ($("deleteConfirm").value.trim().toLowerCase() !== me.username.toLowerCase()) {
+              say("deleteMsg", "Type your username exactly to confirm.", false);
+              return;
+          }
+          if (!confirm("Delete your account for good? This cannot be undone.")) return;
+          const body = { confirm: $("deleteConfirm").value.trim() };
+          if (me.has_password) body.password = $("deletePassword").value;
+          submit($("deleteBtn"), "deleteMsg", "/me", { method: "DELETE", body }, async () => {
+              signOut();
+              location.href = "index.html";
+          });
+      });
+  })();
+  </script>
+</body>
+</html>

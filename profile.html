@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile | JurisCards</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="juris.css">
+  <style>
+    .profile-head { display: flex; gap: 22px; align-items: center; }
+    .big-avatar {
+      width: 76px; height: 76px; flex-shrink: 0; display: grid; place-items: center;
+      background: var(--navy); color: var(--gold-light); font-family: "Playfair Display", serif; font-size: 34px;
+    }
+    .profile-head h1 { font-size: clamp(30px, 4vw, 42px); line-height: 1.15; }
+    .profile-meta { color: var(--muted); font-size: 14px; }
+    .bio { margin-top: 10px; font-size: 15px; max-width: 640px; }
+    .bar { height: 6px; background: #ece9e2; margin-top: 6px; }
+    .bar div { height: 100%; background: var(--ok); }
+    .cat-row { display: grid; grid-template-columns: 1fr 70px; gap: 12px; align-items: center; padding: 9px 0; border-bottom: 1px solid #f0ede6; font-size: 13.5px; }
+    .cat-row:last-child { border-bottom: 0; }
+    .cat-row span { text-align: right; color: var(--muted); font-size: 12.5px; }
+  </style>
+</head>
+<body class="jc-page">
+  <header>
+    <div class="container navbar">
+      <a href="index.html" class="logo"><span class="logo-mark">J</span>JurisCards</a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="browse.html">Browse</a>
+        <a href="flashcard.html">Flashcards</a>
+        <a href="review.html">Review</a>
+      </nav>
+      <div class="header-end"><div class="jc-account" data-account></div></div>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <section class="jc-heading">
+        <div class="profile-head">
+          <div class="big-avatar" id="avatar"></div>
+          <div>
+            <div class="jc-eyebrow">Profile</div>
+            <h1 id="name">Loading</h1>
+            <p class="profile-meta" id="meta"></p>
+          </div>
+        </div>
+        <p class="bio" id="bio"></p>
+        <p class="jc-msg err" id="loadError" role="alert"></p>
+      </section>
+
+      <section class="jc-stats">
+        <div class="jc-stat"><div class="label">Mastered</div><div class="value" id="stMastered">0</div><div class="note" id="stMasteredNote"></div></div>
+        <div class="jc-stat"><div class="label">For review</div><div class="value" id="stReview">0</div><div class="note">Marked to see again</div></div>
+        <div class="jc-stat"><div class="label">My cards</div><div class="value" id="stCards">0</div><div class="note"><a href="flashcard.html?show=mine" style="text-decoration: underline;">Open them</a></div></div>
+        <div class="jc-stat"><div class="label">Quizzes</div><div class="value" id="stQuizzes">0</div><div class="note" id="stQuizNote">None yet</div></div>
+      </section>
+
+      <div class="jc-grid-2">
+        <section class="jc-panel">
+          <h2>By category</h2>
+          <p class="jc-sub">Share of each category's cards you marked as mastered.</p>
+          <div id="catList"></div>
+        </section>
+
+        <section class="jc-panel">
+          <h2>Quiz history</h2>
+          <p class="jc-sub">Your last 20 practice quizzes.</p>
+          <div class="jc-table-wrap">
+            <table class="jc-table">
+              <thead><tr><th>Date</th><th>Category</th><th>Score</th></tr></thead>
+              <tbody id="quizRows"><tr><td colspan="3" class="jc-empty">No quizzes yet.</td></tr></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+
+      <section class="jc-panel">
+        <h2>My cards</h2>
+        <p class="jc-sub">Cards you wrote. Edit or delete them from the flashcards page.</p>
+        <div class="jc-table-wrap">
+          <table class="jc-table">
+            <thead><tr><th>Question</th><th>Category</th><th>Status</th><th>Written</th></tr></thead>
+            <tbody id="cardRows"><tr><td colspan="4" class="jc-empty">You have not written any cards yet.</td></tr></tbody>
+          </table>
+        </div>
+      </section>
+
+      <div class="jc-row">
+        <a class="jc-btn" href="settings.html">Edit profile and settings</a>
+        <a class="jc-btn plain" href="start-review.html">Back to studying</a>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container footer-content">
+      <div class="footer-logo"><span class="logo-mark">J</span> JurisCards</div>
+      <div>Law data from the L-Lawliet database &middot; &copy; 2026 JurisCards</div>
+    </div>
+  </footer>
+
+  <script src="juris.js"></script>
+  <script>
+  (async function () {
+      const { requireLogin, getJson, esc, timeAgo } = Juris;
+      if (!requireLogin()) return;
+      const $ = id => document.getElementById(id);
+
+      let me, summary, cards, quizzes;
+      try {
+          [me, summary, cards, quizzes] = await Promise.all([
+              getJson("/me"), getJson("/study/summary"), getJson("/study/cards"), getJson("/study/quizzes?limit=20"),
+          ]);
+      } catch (err) {
+          $("name").textContent = "Profile";
+          $("loadError").textContent = err.message;
+          return;
+      }
+
+      const name = me.display_name || me.username;
+      $("avatar").textContent = name.charAt(0).toUpperCase();
+      $("name").textContent = name;
+      const since = me.created_at
+          ? new Date(me.created_at).toLocaleDateString("en-PH", { month: "long", year: "numeric" }) : "";
+      $("meta").textContent = [`@${me.username}`, me.role === "admin" ? "Admin" : "Student",
+          since && `Member since ${since}`, me.google_linked && "Signs in with Google"].filter(Boolean).join(" · ");
+      $("bio").textContent = me.bio || "";
+
+      const cats = summary.categories;
+      const total = cats.reduce((n, c) => n + c.laws + c.cards, 0);
+      const mastered = cats.reduce((n, c) => n + c.laws_mastered + c.cards_mastered, 0);
+      const review = cats.reduce((n, c) => n + c.laws_review + c.cards_review, 0);
+      $("stMastered").textContent = mastered;
+      $("stMasteredNote").textContent = `${total ? Math.round(mastered / total * 100) : 0}% of ${total} cards`;
+      $("stReview").textContent = review;
+      $("stCards").textContent = cards.count;
+      $("stQuizzes").textContent = summary.quizzes.attempts;
+      if (summary.quizzes.attempts) {
+          $("stQuizNote").textContent = `Average ${summary.quizzes.average_pct}%, best ${summary.quizzes.best_pct}%`;
+      }
+
+      $("catList").innerHTML = cats.map(c => {
+          const n = c.laws + c.cards;
+          const pct = n ? Math.round((c.laws_mastered + c.cards_mastered) / n * 100) : 0;
+          return `<div class="cat-row"><div>${esc(c.category)}<div class="bar"><div style="width:${pct}%"></div></div></div><span>${pct}%</span></div>`;
+      }).join("");
+
+      if (quizzes.attempts.length) {
+          $("quizRows").innerHTML = quizzes.attempts.map(q => `
+              <tr><td>${esc(timeAgo(q.taken_at))}</td><td>${esc(q.category || "All")}</td>
+                  <td><strong>${q.score} / ${q.total}</strong> <span style="color: var(--muted);">(${Math.round(q.score / q.total * 100)}%)</span></td></tr>`).join("");
+      }
+
+      const statusTag = { mastered: '<span class="jc-tag ok">Mastered</span>', review: '<span class="jc-tag warn">For review</span>', new: '<span class="jc-tag">Not studied</span>' };
+      if (cards.cards.length) {
+          $("cardRows").innerHTML = cards.cards.map(c => `
+              <tr><td>${esc(c.question)}</td><td>${esc(c.category)}</td><td>${statusTag[c.status]}</td><td>${esc(timeAgo(c.created_at))}</td></tr>`).join("");
+      }
+  })();
+  </script>
+</body>
+</html>

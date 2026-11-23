@@ -195,7 +195,7 @@
                     rgba(7,21,37,0.86) 55%,
                     rgba(7,21,37,0.35) 100%
                 ),
-                url("hero-law.jpg");
+                url("images/hero-justice.png");
 
             background-size: cover;
             background-position: center right;
@@ -486,12 +486,13 @@
         .jurisdiction-grid {
             display: grid;
 
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(3, 1fr);
 
             gap: 18px;
         }
 
         .jurisdiction-card {
+            display: block;
             min-height: 250px;
 
             padding: 30px;
@@ -678,7 +679,7 @@
                         rgba(7,21,37,0.88),
                         #071525 80%
                     ),
-                    url("hero-law.jpg");
+                    url("images/hero-justice.png");
 
                 background-position: center;
             }
@@ -728,6 +729,7 @@
         }
 
     </style>
+  <link rel="stylesheet" href="juris.css">
 </head>
 
 <body>
@@ -738,37 +740,20 @@
     =========================================== -->
 
     <header>
-
-        <div class="container navbar">
-
-            <a href="index.html" class="logo">
-                <span class="logo-symbol">⚖</span>
-                JurisCards
-            </a>
-
-            <nav class="nav-links">
-
-                <a href="index.html" class="active">
-                    Home
-                </a>
-
-                <a href="flashcard.html">
-                    Flashcard
-                </a>
-
-                <a href="review.html">
-                    Review
-                </a>
-
-            </nav>
-
-            <a href="start-review.html" class="header-button">
-                Start Studying
-            </a>
-
-        </div>
-
-    </header>
+    <div class="container navbar">
+      <a href="index.html" class="logo"><span class="logo-mark">J</span>JurisCards</a>
+      <nav class="nav-links">
+        <a href="index.html" class="active">Home</a>
+        <a href="browse.html">Browse</a>
+        <a href="flashcard.html">Flashcards</a>
+        <a href="review.html">Review</a>
+      </nav>
+      <div class="header-end">
+        <a href="start-review.html" class="header-button">Start studying</a>
+        <div class="jc-account" data-account></div>
+      </div>
+    </div>
+  </header>
 
 
 
@@ -777,306 +762,92 @@
     =========================================== -->
 
     <main>
-
         <section class="hero">
-
             <div class="container">
-
                 <div class="hero-content">
-
-                    <div class="eyebrow">
-                        Philippine Legal Studies
-                    </div>
-
+                    <div class="eyebrow">Philippine law study cards</div>
                     <h1>
-                        Know the Law.<br>
-                        <span>Understand Your Rights.</span>
+                        Learn the laws<br>
+                        <span>that affect you.</span>
                     </h1>
-
                     <p class="hero-description">
-                        JurisCards is a focused study platform designed to help
-                        students understand Philippine law through structured
-                        flashcards, legal concepts, and review materials.
+                        Flashcards and short quizzes on Philippine Republic Acts.
+                        The laws come from the L-Lawliet database, so a law added
+                        there shows up here as a new card.
                     </p>
-
                     <div class="hero-buttons">
-
-                        <a href="flashcard.html" class="btn-primary">
-                            Explore Flashcards
-                        </a>
-
-                        <a href="#philippine-law" class="btn-secondary">
-                            Learn About Philippine Law
-                        </a>
-
+                        <a href="flashcard.html" class="btn-primary">Open flashcards</a>
+                        <a href="browse.html" class="btn-secondary">Browse the laws</a>
                     </div>
-
                 </div>
-
             </div>
-
         </section>
 
-
-
-        <!-- ==========================================
-             PHILIPPINE LAW INTRO
-        =========================================== -->
-
-        <section class="introduction" id="philippine-law">
-
+        <section class="introduction" id="how-it-works">
             <div class="container">
-
-                <div class="section-label">
-                    Philippine Legal System
-                </div>
-
-                <h2 class="section-title">
-                    Understanding the foundations of Philippine law.
-                </h2>
-
-                <p class="section-description">
-                    The Philippine legal system is shaped by the Constitution,
-                    statutes enacted by Congress, administrative regulations,
-                    judicial decisions, and established legal principles.
-                    Understanding how these sources interact is fundamental
-                    to the study and practice of law.
+                <div class="section-label">How it works</div>
+                <h2 class="section-title">Read it, flip it, then test yourself.</h2>
+                <p class="section-description" id="lawCountLine">
+                    Each Republic Act in the database has a plain-English summary,
+                    an example, the penalties and notes from other students.
                 </p>
 
-
                 <div class="law-grid">
-
-
                     <article class="law-card">
-
-                        <div class="law-number">
-                            01 / CONSTITUTION
-                        </div>
-
-                        <h3>
-                            1987 Constitution
-                        </h3>
-
-                        <p>
-                            The fundamental and supreme law of the Philippines.
-                            It establishes the structure of government and
-                            protects the fundamental rights of the people.
-                        </p>
-
-                        <a href="#">
-                            Explore →
-                        </a>
-
+                        <div class="law-number">01 / Read</div>
+                        <h3>Browse the laws</h3>
+                        <p>Search by title, RA number, president or category and read what each law actually requires.</p>
+                        <a href="browse.html">Browse</a>
                     </article>
-
-
-
                     <article class="law-card">
-
-                        <div class="law-number">
-                            02 / LEGISLATION
-                        </div>
-
-                        <h3>
-                            Statutory Law
-                        </h3>
-
-                        <p>
-                            Laws enacted by Congress that govern rights,
-                            obligations, relationships, and conduct within
-                            Philippine society.
-                        </p>
-
-                        <a href="#">
-                            Explore →
-                        </a>
-
+                        <div class="law-number">02 / Flip</div>
+                        <h3>Study with flashcards</h3>
+                        <p>Every law is a card. Mark each one as mastered or for review, and come back to the ones you missed.</p>
+                        <a href="flashcard.html">Flashcards</a>
                     </article>
-
-
-
                     <article class="law-card">
-
-                        <div class="law-number">
-                            03 / JUDICIARY
-                        </div>
-
-                        <h3>
-                            Case Law
-                        </h3>
-
-                        <p>
-                            Decisions of the Supreme Court and other courts
-                            that interpret laws and contribute to the
-                            development of Philippine jurisprudence.
-                        </p>
-
-                        <a href="#">
-                            Explore →
-                        </a>
-
+                        <div class="law-number">03 / Test</div>
+                        <h3>Take a practice quiz</h3>
+                        <p>Multiple-choice questions on years, presidents, categories, fines and example cases.</p>
+                        <a href="start-review.html#quiz">Start a quiz</a>
                     </article>
-
                 </div>
-
             </div>
-
         </section>
-
-
-
-        <!-- ==========================================
-             JURISDICTION
-        =========================================== -->
 
         <section class="jurisdiction">
-
             <div class="container">
-
                 <div class="jurisdiction-header">
-
                     <div>
-
-                        <div class="section-label">
-                            Legal Framework
-                        </div>
-
-                        <h2 class="section-title">
-                            Jurisdiction &amp; Legal Fields
-                        </h2>
-
+                        <div class="section-label">Categories</div>
+                        <h2 class="section-title">Study by category</h2>
                     </div>
-
                     <p class="section-description">
-                        Explore major areas of Philippine law and build a
-                        stronger foundation for your legal studies.
+                        The same six categories L-Lawliet uses. Pick one to open
+                        the flashcards for those laws only.
                     </p>
-
                 </div>
-
-
-                <div class="jurisdiction-grid">
-
-
-                    <article class="jurisdiction-card">
-
-                        <div class="jurisdiction-icon">
-                            §
-                        </div>
-
-                        <h3>
-                            Constitutional Law
-                        </h3>
-
-                        <p>
-                            Study the Constitution, government powers,
-                            individual rights, and constitutional principles.
-                        </p>
-
-                    </article>
-
-
-
-                    <article class="jurisdiction-card">
-
-                        <div class="jurisdiction-icon">
-                            ⚖
-                        </div>
-
-                        <h3>
-                            Criminal Law
-                        </h3>
-
-                        <p>
-                            Understand offenses, penalties, criminal liability,
-                            and principles under Philippine criminal law.
-                        </p>
-
-                    </article>
-
-
-
-                    <article class="jurisdiction-card">
-
-                        <div class="jurisdiction-icon">
-                            ◇
-                        </div>
-
-                        <h3>
-                            Civil Law
-                        </h3>
-
-                        <p>
-                            Explore obligations, contracts, property,
-                            succession, and other private legal relationships.
-                        </p>
-
-                    </article>
-
-
-
-                    <article class="jurisdiction-card">
-
-                        <div class="jurisdiction-icon">
-                            №
-                        </div>
-
-                        <h3>
-                            Remedial Law
-                        </h3>
-
-                        <p>
-                            Review procedural rules governing civil,
-                            criminal, and special proceedings before courts.
-                        </p>
-
-                    </article>
-
-                </div>
-
+                <div class="jurisdiction-grid" id="categoryGrid"></div>
             </div>
-
         </section>
-
-
-
-        <!-- ==========================================
-             CTA
-        =========================================== -->
 
         <section class="study-cta">
-
             <div class="container">
-
                 <div class="cta-container">
-
                     <div>
-
-                        <div class="section-label">
-                            Begin Your Review
-                        </div>
-
-                        <h2>
-                            Build your legal foundation.
-                        </h2>
-
-                        <p>
-                            Turn complex legal concepts into structured,
-                            focused study sessions with JurisCards.
+                        <div class="section-label" id="ctaLabel">Free account</div>
+                        <h2 id="ctaTitle">Keep your progress.</h2>
+                        <p id="ctaText">
+                            Guests can read 10 laws and take 5-question quizzes, but nothing
+                            is saved. An account opens every law, saves your marks and quiz
+                            scores, and lets you write your own cards. It is the same account
+                            you use on L-Lawliet.
                         </p>
-
                     </div>
-
-                    <a href="flashcard.html" class="btn-primary">
-                        Start Reviewing →
-                    </a>
-
+                    <a href="login.html?signup=1" class="btn-primary" id="ctaBtn">Create an account</a>
                 </div>
-
             </div>
-
         </section>
-
     </main>
 
 
@@ -1086,20 +857,51 @@
     =========================================== -->
 
     <footer>
+    <div class="container footer-content">
+      <div class="footer-logo"><span class="logo-mark">J</span> JurisCards</div>
+      <div class="copyright">Law data from the L-Lawliet database &middot; &copy; 2026 JurisCards</div>
+    </div>
+  </footer>
+  <script src="juris.js"></script>
+  <script>
+  (async function () {
+      const { getAuth, getJson, esc, displayName } = Juris;
+      const grid = document.getElementById("categoryGrid");
+      const blurbs = {
+          "Technology & Crime": "Cybercrime, data privacy, wiretapping and electronic evidence.",
+          "Finance & Taxes": "Income tax, excise tax and filing with the BIR.",
+          "Governance & Business": "Red tape, consumer rights, small business, intellectual property and public officials.",
+          "Social & Welfare": "Senior citizens, women and children, health coverage, drugs and harassment.",
+          "Environment": "Garbage segregation, clean air, clean water and climate action.",
+          "Education & Civil Rights": "Bullying, free tuition, K to 12, harassment in schools and PWD rights.",
+      };
+      const initials = name => name.split(/\s+/).filter(w => /^[A-Z]/.test(w)).map(w => w[0]).join("").slice(0, 2);
 
-        <div class="container footer-content">
+      if (getAuth()) {
+          document.getElementById("ctaLabel").textContent = "Signed in";
+          document.getElementById("ctaTitle").textContent = `Welcome back, ${displayName()}.`;
+          document.getElementById("ctaText").textContent = "Your marks, cards and quiz scores are saved to your account. Pick up where you left off.";
+          const btn = document.getElementById("ctaBtn");
+          btn.textContent = "Continue studying";
+          btn.href = "start-review.html";
+      }
 
-            <div class="footer-logo">
-                <span>⚖</span> JurisCards
-            </div>
-
-            <div class="copyright">
-                © 2026 JurisCards. Philippine Law Study Platform.
-            </div>
-
-        </div>
-
-    </footer>
+      try {
+          const stats = await getJson("/stats");
+          document.getElementById("lawCountLine").textContent =
+              `The database has ${stats.total} Republic Acts, each with a plain-English summary, an example, the penalties and notes from other students.`;
+          grid.innerHTML = Object.entries(stats.categories).sort(([a], [b]) => a.localeCompare(b)).map(([name, count]) => `
+              <a class="jurisdiction-card" href="flashcard.html?subject=${encodeURIComponent(name)}">
+                  <div class="jurisdiction-icon">${esc(initials(name))}</div>
+                  <h3>${esc(name)}</h3>
+                  <p>${esc(blurbs[name] || "")}</p>
+                  <p style="margin-top: 10px; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; color: var(--gold);">${count} law${count === 1 ? "" : "s"}</p>
+              </a>`).join("");
+      } catch {
+          grid.innerHTML = '<p style="color: var(--muted);">Could not load the categories right now.</p>';
+      }
+  })();
+  </script>
 
 
 </body>

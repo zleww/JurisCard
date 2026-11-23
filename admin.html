@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin | JurisCards</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="juris.css">
+  <style>
+    .filter-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+    .filter-row input, .filter-row select { padding: 9px 12px; border: 1px solid #cfcbc1; font: inherit; font-size: 13.5px; background: #fff; }
+    .filter-row input { flex: 1; min-width: 200px; }
+    .muted { color: var(--muted); }
+  </style>
+</head>
+<body class="jc-page">
+  <header>
+    <div class="container navbar">
+      <a href="index.html" class="logo"><span class="logo-mark">J</span>JurisCards</a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="browse.html">Browse</a>
+        <a href="flashcard.html">Flashcards</a>
+        <a href="review.html">Review</a>
+      </nav>
+      <div class="header-end"><div class="jc-account" data-account></div></div>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <section class="jc-heading">
+        <div class="jc-eyebrow">Admin</div>
+        <h1>Admin</h1>
+        <p>Accounts and study activity across JurisCards and L-Lawliet. Both sites read the same database.</p>
+        <p class="jc-msg err" id="loadError" role="alert"></p>
+      </section>
+
+      <section class="jc-stats" id="stats">
+        <div class="jc-stat"><div class="label">Accounts</div><div class="value" id="stUsers">-</div><div class="note" id="stUsersNote"></div></div>
+        <div class="jc-stat"><div class="label">Laws</div><div class="value" id="stLaws">-</div><div class="note" id="stNotes"></div></div>
+        <div class="jc-stat"><div class="label">Cards written</div><div class="value" id="stCards">-</div><div class="note" id="stMastered"></div></div>
+        <div class="jc-stat"><div class="label">Quizzes taken</div><div class="value" id="stQuizzes">-</div><div class="note" id="stQuizAvg"></div></div>
+      </section>
+
+      <section class="jc-panel">
+        <h2>Accounts</h2>
+        <p class="jc-sub">Study activity per account. Passwords, emails and Google ids are never sent to this page.</p>
+        <div class="filter-row">
+          <input id="userSearch" placeholder="Search by username or name" aria-label="Search accounts">
+          <select id="roleFilter" aria-label="Filter by role">
+            <option value="">All roles</option>
+            <option value="user">Students</option>
+            <option value="admin">Admins</option>
+          </select>
+        </div>
+        <div class="jc-table-wrap">
+          <table class="jc-table">
+            <thead>
+              <tr><th>Account</th><th>Role</th><th>Joined</th><th>Mastered</th><th>Own cards</th><th>Quizzes</th><th>Notes</th><th>Last active</th></tr>
+            </thead>
+            <tbody id="userRows"><tr><td colspan="8" class="jc-empty">Loading</td></tr></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="jc-panel">
+        <h2>Laws</h2>
+        <p class="jc-sub">Laws are added and edited on the L-Lawliet admin page with the same admin account. Changes show up here on the next page load.</p>
+        <div class="jc-row" style="margin-bottom: 14px;">
+          <a class="jc-btn" id="lawlietAdmin" href="https://l-lawliet-three.vercel.app/admin.html" target="_blank" rel="noopener">Open L-Lawliet admin</a>
+        </div>
+        <div class="jc-table-wrap">
+          <table class="jc-table">
+            <thead><tr><th>RA number</th><th>Title</th><th>Category</th><th>Year</th><th>Notes</th></tr></thead>
+            <tbody id="lawRows"><tr><td colspan="5" class="jc-empty">Loading</td></tr></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container footer-content">
+      <div class="footer-logo"><span class="logo-mark">J</span> JurisCards</div>
+      <div>Law data from the L-Lawliet database &middot; &copy; 2026 JurisCards</div>
+    </div>
+  </footer>
+
+  <script src="juris.js"></script>
+  <script>
+  (async function () {
+      const { requireLogin, isAdmin, getJson, loadLaws, esc, timeAgo, API } = Juris;
+      if (!requireLogin()) return;
+      const $ = id => document.getElementById(id);
+      // Hiding the page is only tidiness: the API answers 403 to anyone who is not an admin.
+      if (!isAdmin()) { location.href = "profile.html"; return; }
+      if (API.startsWith("http://127.0.0.1")) $("lawlietAdmin").href = "http://127.0.0.1:8000/admin.html";
+
+      let overview, users, laws;
+      try {
+          [overview, { users }, { laws }] = await Promise.all([
+              getJson("/admin/overview"), getJson("/admin/study-activity"), loadLaws(),
+          ]);
+      } catch (err) {
+          $("loadError").textContent = err.message;
+          return;
+      }
+
+      $("stUsers").textContent = overview.users;
+      $("stUsersNote").textContent = `${overview.admins} admin${overview.admins === 1 ? "" : "s"}, ${overview.new_this_week} new this week`;
+      $("stLaws").textContent = overview.laws;
+      $("stNotes").textContent = `${overview.comments} student notes`;
+      $("stCards").textContent = overview.flashcards;
+      $("stMastered").textContent = `${overview.laws_mastered} law cards mastered`;
+      $("stQuizzes").textContent = overview.quiz_attempts;
+      $("stQuizAvg").textContent = overview.quiz_average_pct === null ? "No scores yet" : `Average score ${overview.quiz_average_pct}%`;
+
+      function renderUsers() {
+          const q = $("userSearch").value.trim().toLowerCase();
+          const role = $("roleFilter").value;
+          const rows = users.filter(u =>
+              (!role || u.role === role) &&
+              (!q || u.username.toLowerCase().includes(q) || (u.display_name || "").toLowerCase().includes(q)));
+          $("userRows").innerHTML = rows.length ? rows.map(u => `
+              <tr>
+                <td><strong>${esc(u.display_name || u.username)}</strong><br><span class="muted">@${esc(u.username)}</span></td>
+                <td>${u.role === "admin" ? '<span class="jc-tag admin">Admin</span>' : '<span class="jc-tag">Student</span>'}</td>
+                <td>${esc(new Date(u.created_at).toLocaleDateString("en-PH"))}</td>
+                <td>${u.laws_mastered}</td>
+                <td>${u.flashcards}</td>
+                <td>${u.quizzes}${u.quiz_average_pct !== null ? ` <span class="muted">(avg ${u.quiz_average_pct}%)</span>` : ""}</td>
+                <td>${u.notes}</td>
+                <td>${u.last_active ? esc(timeAgo(u.last_active)) : '<span class="muted">Never</span>'}</td>
+              </tr>`).join("") : '<tr><td colspan="8" class="jc-empty">No accounts match.</td></tr>';
+      }
+      $("userSearch").addEventListener("input", renderUsers);
+      $("roleFilter").addEventListener("change", renderUsers);
+      renderUsers();
+
+      $("lawRows").innerHTML = laws.map(l => `
+          <tr>
+            <td><a href="browse.html?law=${l.id}" style="text-decoration: underline;">${esc(l.ra_number)}</a></td>
+            <td>${esc(l.plain_title)}</td>
+            <td>${esc(l.category)}</td>
+            <td>${esc(l.year)}</td>
+            <td>${l.user_notes.length}</td>
+          </tr>`).join("");
+  })();
+  </script>
+</body>
+</html>

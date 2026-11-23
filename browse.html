@@ -256,6 +256,12 @@
       cursor: pointer;
     }
 
+    button.card {
+      font: inherit;
+      color: inherit;
+      width: 100%;
+    }
+
     .card:hover {
       border-color: var(--gold);
       transform: translateY(-3px);
@@ -476,350 +482,270 @@
       .grid { grid-template-columns: 1fr; }
     }
   </style>
+  <link rel="stylesheet" href="juris.css">
 </head>
 <body>
 
   <!-- NAVIGATION -->
   <header>
     <div class="container navbar">
-      <a href="index.html" class="logo">
-        <span class="logo-symbol">⚖</span>
-        JurisCards
-      </a>
-
+      <a href="index.html" class="logo"><span class="logo-mark">J</span>JurisCards</a>
       <nav class="nav-links">
         <a href="index.html">Home</a>
-        <a href="browse.html" class="active">Browse Laws</a>
+        <a href="browse.html" class="active">Browse</a>
+        <a href="flashcard.html">Flashcards</a>
+        <a href="review.html">Review</a>
       </nav>
-
-      <div class="header-action">
-        <a href="browse.html" class="header-btn">Start Studying</a>
+      <div class="header-end">
+        <a href="start-review.html" class="header-btn">Start studying</a>
+        <div class="jc-account" data-account></div>
       </div>
     </div>
   </header>
 
-  <!-- HERO SECTION -->
   <section class="hero">
     <div class="container hero-content">
-      <div class="eyebrow">Philippine Statutory Repository</div>
-      <h1>Browse All <span class="gold-text">Republic Acts.</span></h1>
-      <p>Explore our complete database of Philippine laws explained in plain English. Use the search bar or category filters below.</p>
-      
+      <div class="eyebrow">Browse</div>
+      <h1>Republic Acts in <span class="gold-text">plain English.</span></h1>
+      <p>Every law here comes from the L-Lawliet database. Open one to read the summary, an example, the penalties and notes from other students.</p>
+
       <div class="search-container">
-        <input type="text" id="searchInput" placeholder="Search by RA number, keyword, or topic (e.g. Libel, TRAIN, Bawal Bastos)..." />
+        <input type="text" id="searchInput" placeholder="Search by RA number, title, president or topic" aria-label="Search laws" />
         <button class="search-btn" id="searchSubmitBtn">Search</button>
       </div>
     </div>
   </section>
 
-  <!-- CATEGORY FILTERS -->
   <section class="container filter-section">
-    <div id="categoryFilters">
-      <button class="filter-btn active-filter" data-category="All">All Laws</button>
-      <button class="filter-btn" data-category="Technology & Crime">Technology & Crime</button>
-      <button class="filter-btn" data-category="Finance & Taxes">Finance & Taxes</button>
-      <button class="filter-btn" data-category="Governance & Business">Governance & Business</button>
-      <button class="filter-btn" data-category="Social & Welfare">Social & Welfare</button>
-      <button class="filter-btn" data-category="Environment">Environment</button>
-    </div>
+    <div id="categoryFilters"></div>
   </section>
 
-  <!-- MAIN LAWS GRID -->
   <main class="container content-wrapper">
+    <div id="guestNote"></div>
     <div id="lawsGrid" class="grid"></div>
   </main>
 
-  <!-- MODAL DEEP DIVE -->
-  <div id="lawModal" class="modal hidden">
+  <div id="lawModal" class="modal hidden" role="dialog" aria-modal="true">
     <div class="modal-content">
-      <button id="closeModal" class="close-btn">&times;</button>
+      <button id="closeModal" class="close-btn" aria-label="Close">&times;</button>
       <div id="modalBody"></div>
     </div>
   </div>
 
-  <!-- FOOTER -->
   <footer>
     <div class="container footer-content">
-      <div class="footer-logo"><span>⚖</span> JurisCards</div>
-      <div class="copyright">&copy; 2026 JurisCards. Philippine Law Study Platform.</div>
+      <div class="footer-logo"><span class="logo-mark">J</span> JurisCards</div>
+      <div class="copyright">Law data from the L-Lawliet database &middot; &copy; 2026 JurisCards</div>
     </div>
   </footer>
+  <script src="juris.js"></script>
 
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const API_KEY = "student-api-key-123";
-      const lawsGrid = document.getElementById("lawsGrid");
-      const searchInput = document.getElementById("searchInput");
-      const searchSubmitBtn = document.getElementById("searchSubmitBtn");
-      const filterButtons = document.querySelectorAll(".filter-btn");
-      const modal = document.getElementById("lawModal");
-      const modalBody = document.getElementById("modalBody");
-      const closeModal = document.getElementById("closeModal");
+(async function () {
+    const { getAuth, api, errorMessage, loadLaws, guestNotice, esc, safeUrl, peso, timeAgo, displayName } = Juris;
+    const $ = id => document.getElementById(id);
+    const auth = getAuth();
+    const params = new URLSearchParams(location.search);
+    const grid = $("lawsGrid");
+    const modal = $("lawModal");
+    let allLaws = [];
+    let category = params.get("category") || "All";
 
-      let allLaws = [];
-      let currentCategory = "All";
+    if (params.get("search")) $("searchInput").value = params.get("search");
 
-      // 1. Check URL parameters (?search=... or ?category=...)
-      const urlParams = new URLSearchParams(window.location.search);
-      const initialSearchQuery = urlParams.get("search");
-      const initialCategory = urlParams.get("category");
+    try {
+        const data = await loadLaws();
+        allLaws = data.laws;
+        $("guestNote").innerHTML = guestNotice(
+            `You are reading ${data.count} of ${data.total} laws as a guest. Sign in to read all of them and add notes.`);
+    } catch (err) {
+        grid.innerHTML = `<p style="color: var(--muted); grid-column: 1/-1; text-align: center; padding: 40px;">Could not load the laws. ${esc(err.message)}</p>`;
+        return;
+    }
 
-      if (initialSearchQuery && searchInput) {
-        searchInput.value = initialSearchQuery;
-      }
+    // ---------- Category buttons from the data ----------
+    const cats = [...new Set(allLaws.map(l => l.category))].sort();
+    if (category !== "All" && !cats.includes(category)) category = "All";
+    $("categoryFilters").innerHTML = ["All", ...cats].map(c =>
+        `<button class="filter-btn${c === category ? " active-filter" : ""}" data-category="${esc(c)}">${c === "All" ? "All laws" : esc(c)}</button>`
+    ).join("");
+    $("categoryFilters").addEventListener("click", e => {
+        const btn = e.target.closest(".filter-btn");
+        if (!btn) return;
+        $("categoryFilters").querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active-filter"));
+        btn.classList.add("active-filter");
+        category = btn.dataset.category;
+        render();
+    });
 
-      if (initialCategory) {
-        currentCategory = initialCategory;
-        filterButtons.forEach(btn => {
-          if (btn.getAttribute("data-category").toLowerCase() === initialCategory.toLowerCase()) {
-            btn.classList.add("active-filter");
-          } else {
-            btn.classList.remove("active-filter");
-          }
-        });
-      }
-
-// 1. Point directly to your primary L-Lawliet live backend
-      const BASE_API_URL = "https://l-lawliet-three.vercel.app/api/v1";
-
-      // 2. Fetch laws from FastAPI backend
-      async function fetchLaws() {
-        try {
-          const response = await fetch(`${BASE_API_URL}/laws`, {
-            headers: { 'x-api-key': API_KEY }
-          });
-
-          if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-          }
-
-          const data = await response.json();
-          allLaws = Array.isArray(data) ? data : (data.laws || []);
-
-          // Sync local notes
-          const savedNotes = JSON.parse(localStorage.getItem("juris_law_notes") || "{}");
-          allLaws.forEach(law => {
-            if (savedNotes[law.id]) {
-              law.user_notes = savedNotes[law.id];
-            } else if (!law.user_notes) {
-              law.user_notes = [];
-            }
-          });
-
-          filterAndDisplay();
-        } catch (error) {
-          console.error("Fetch error on browse page:", error);
-          if (lawsGrid) {
-            lawsGrid.innerHTML = `<p style="color: var(--text-muted); grid-column: 1/-1; text-align: center; padding: 40px;">Failed to load laws from the backend. Please check your connection or server status.</p>`;
-          }
+    // ---------- Grid ----------
+    function render() {
+        const q = $("searchInput").value.trim().toLowerCase();
+        const shown = allLaws.filter(law =>
+            (category === "All" || law.category === category) &&
+            (!q || [law.ra_number, law.plain_title, law.official_title, law.tldr_summary, law.category,
+                    law.enacting_president, law.target_audience, String(law.year)]
+                .some(t => (t || "").toLowerCase().includes(q))));
+        if (shown.length === 0) {
+            grid.innerHTML = `<p style="color: var(--muted); grid-column: 1/-1; text-align: center; padding: 50px;">No laws match your search.</p>`;
+            return;
         }
-      }
-
-      // 3. Filter & Render
-      function filterAndDisplay() {
-        const query = searchInput ? searchInput.value.toLowerCase().trim() : "";
-
-        const filtered = allLaws.filter(law => {
-          const matchesCategory = currentCategory === "All" || law.category === currentCategory;
-          const matchesSearch = !query ||
-            (law.ra_number && law.ra_number.toLowerCase().includes(query)) ||
-            (law.plain_title && law.plain_title.toLowerCase().includes(query)) ||
-            (law.official_title && law.official_title.toLowerCase().includes(query)) ||
-            (law.tldr_summary && law.tldr_summary.toLowerCase().includes(query)) ||
-            (law.category && law.category.toLowerCase().includes(query)) ||
-            (law.enacting_president && law.enacting_president.toLowerCase().includes(query)) ||
-            (law.target_audience && law.target_audience.toLowerCase().includes(query));
-
-          return matchesCategory && matchesSearch;
+        grid.innerHTML = "";
+        shown.forEach(law => {
+            const card = document.createElement("button");
+            card.type = "button";
+            card.className = "card";
+            card.style.textAlign = "left";
+            card.innerHTML = `
+                <div>
+                  <div class="card-top-row">
+                    <span class="badge">${esc(law.category)}</span>
+                    <span style="color: var(--muted); font-size: 12px;">Enacted ${esc(law.year)}</span>
+                  </div>
+                  <h3>${esc(law.ra_number)}</h3>
+                  <h4>${esc(law.plain_title)}</h4>
+                  <p class="summary">${esc(law.tldr_summary)}</p>
+                </div>
+                <span class="click-more">Read more</span>`;
+            card.addEventListener("click", () => openModal(law));
+            grid.appendChild(card);
         });
+    }
 
-        displayLaws(filtered);
-      }
+    let timer;
+    $("searchInput").addEventListener("input", () => { clearTimeout(timer); timer = setTimeout(render, 150); });
+    $("searchSubmitBtn").addEventListener("click", render);
+    $("searchInput").addEventListener("keydown", e => { if (e.key === "Enter") render(); });
 
-      function displayLaws(laws) {
-        lawsGrid.innerHTML = "";
-
-        if (laws.length === 0) {
-          lawsGrid.innerHTML = `<p style="color: var(--text-muted); grid-column: 1/-1; text-align: center; padding: 50px;">No laws found matching your search or category filter.</p>`;
-          return;
+    // ---------- Law detail ----------
+    function notesHtml(law) {
+        if (!law.user_notes.length) {
+            return '<p style="color: #7b858d; font-size: 13px; margin-bottom: 12px;">No notes yet.</p>';
         }
+        return law.user_notes.map(n => {
+            const mine = auth && n.user_id === auth.id;
+            return `
+              <div class="comment-bubble" data-id="${n.id}" style="display:block;">
+                <div style="display:flex; justify-content:space-between; gap:10px; align-items:baseline;">
+                  <strong>${esc(n.user_name)}</strong>
+                  <span style="font-size: 11.5px; color: #7b858d;">${esc(timeAgo(n.created_at))}${n.edited_at ? " · edited" : ""}</span>
+                </div>
+                <p class="note-text" style="margin-top: 4px;">${esc(n.comment)}</p>
+                ${mine ? '<button class="delete-comment-btn edit-note-btn" style="color: var(--navy); margin-top: 6px; padding: 0;">Edit</button>' : ""}
+              </div>`;
+        }).join("");
+    }
 
-        laws.forEach(law => {
-          const card = document.createElement("div");
-          card.className = "card";
-          card.innerHTML = `
-            <div>
-              <div class="card-top-row">
-                <span class="badge">${law.category}</span>
-                <span style="color: var(--muted); font-size: 12px;">Enacted ${law.year || 'N/A'}</span>
-              </div>
-              <h3>${law.ra_number}</h3>
-              <h4>${law.plain_title}</h4>
-              <p class="summary">${law.tldr_summary}</p>
-            </div>
-            <span class="click-more">View Statutory Breakdown &rarr;</span>
-          `;
-
-          card.addEventListener("click", () => openModal(law));
-          lawsGrid.appendChild(card);
-        });
-      }
-
-      // 4. Search Listeners
-      if (searchInput) {
-        searchInput.addEventListener("input", filterAndDisplay);
-      }
-      if (searchSubmitBtn) {
-        searchSubmitBtn.addEventListener("click", filterAndDisplay);
-      }
-
-      // 5. Category Filters
-      filterButtons.forEach(btn => {
-        btn.addEventListener("click", (e) => {
-          filterButtons.forEach(b => b.classList.remove("active-filter"));
-          e.target.classList.add("active-filter");
-          currentCategory = e.target.getAttribute("data-category");
-          filterAndDisplay();
-        });
-      });
-
-      // 6. Deep Dive Modal
-      function openModal(law) {
-        if (!law.user_notes) law.user_notes = [];
-
-        const formattedFine = law.min_fine_php 
-          ? `₱${Number(law.min_fine_php).toLocaleString()}` 
-          : "None / Discretionary";
-
-        modalBody.innerHTML = `
+    function openModal(law) {
+        $("modalBody").innerHTML = `
           <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px;">
-            <span style="background: rgba(201, 164, 92, 0.15); color: var(--gold); padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700;">${law.category} (${law.year})</span>
-            <span style="background: #eceff1; color: var(--navy); padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;">Status: ${law.status || 'Active'}</span>
-            <span style="background: #eceff1; color: #59636d; padding: 4px 10px; border-radius: 20px; font-size: 11px;">⏱️ ${law.reading_time_minutes || 3} min read</span>
+            <span style="background: rgba(201, 164, 92, 0.15); color: #7a5c1e; padding: 4px 10px; font-size: 11px; font-weight: 700;">${esc(law.category)} (${esc(law.year)})</span>
+            <span style="background: #eceff1; color: var(--navy); padding: 4px 10px; font-size: 11px; font-weight: 600;">${esc(law.status)}</span>
+            <span style="background: #eceff1; color: #59636d; padding: 4px 10px; font-size: 11px;">${esc(law.reading_time_minutes)} min read</span>
           </div>
-
-          <h2 style="font-family: 'Playfair Display', serif; font-size: 26px; color: var(--navy); margin-bottom: 4px;">${law.ra_number}: ${law.plain_title}</h2>
-          <p style="color: #68717b; font-style: italic; font-size: 13.5px; margin-bottom: 18px;">"${law.official_title}" &bull; System ID #${law.id}</p>
+          <h2 style="font-family: 'Playfair Display', serif; font-size: 26px; color: var(--navy); margin-bottom: 4px;">${esc(law.ra_number)}: ${esc(law.plain_title)}</h2>
+          <p style="color: #68717b; font-style: italic; font-size: 13.5px; margin-bottom: 18px;">${esc(law.official_title)}</p>
 
           <div class="meta-panel">
-            <div>
-              <span>Enacting President</span>
-              <strong>${law.enacting_president || 'Executive Office'}</strong>
-            </div>
-            <div>
-              <span>Total Sections</span>
-              <strong>${law.total_sections || 'Statutory Code'}</strong>
-            </div>
-            <div>
-              <span>Base Minimum Fine</span>
-              <strong>${formattedFine}</strong>
-            </div>
-            <div style="grid-column: 1 / -1;">
-              <span>Target Scope</span>
-              <strong>${law.target_audience || 'General Public'}</strong>
-            </div>
+            <div><span>Signed by</span><strong>${esc(law.enacting_president)}</strong></div>
+            <div><span>Sections</span><strong>${esc(law.total_sections)}</strong></div>
+            <div><span>Minimum fine</span><strong>${law.min_fine_php > 0 ? esc(peso(law.min_fine_php)) : "None set"}</strong></div>
+            <div style="grid-column: 1 / -1;"><span>Who it covers</span><strong>${esc(law.target_audience)}</strong></div>
           </div>
 
-          <div class="detail-section">
-            <h4>Quick Summary (TL;DR)</h4>
-            <p>${law.tldr_summary}</p>
-          </div>
-
-          <div class="detail-section">
-            <h4>Full Simplified Breakdown</h4>
-            <p>${law.full_breakdown || law.tldr_summary}</p>
-          </div>
-
-          <div class="detail-section">
-            <h4>Why It Matters</h4>
-            <p>${law.why_it_matters || 'Protects public rights and establishes statutory penalties.'}</p>
-          </div>
-
-          <div class="detail-section">
-            <h4>Example Scenario</h4>
-            <p>${law.example_scenario || 'Application varies based on judicial merits.'}</p>
-          </div>
-
-          <div class="detail-section">
-            <h4>Penalties & Violations</h4>
-            <p>${law.penalties || 'Judicial discretion and statutory fines apply.'}</p>
-          </div>
-
-          <div class="detail-section">
-            <h4>Official Source</h4>
-            <a href="${law.source_url}" target="_blank" rel="noopener noreferrer" style="color: var(--gold); text-decoration: underline; font-size: 13.5px; font-weight: 600;">Read Official Gazette Filing &rarr;</a>
+          <div class="detail-section"><h4>Summary</h4><p>${esc(law.tldr_summary)}</p></div>
+          <div class="detail-section"><h4>In more detail</h4><p>${esc(law.full_breakdown)}</p></div>
+          <div class="detail-section"><h4>Why it matters</h4><p>${esc(law.why_it_matters)}</p></div>
+          <div class="detail-section"><h4>Example</h4><p>${esc(law.example_scenario)}</p></div>
+          <div class="detail-section"><h4>Penalties</h4><p>${esc(law.penalties)}</p></div>
+          <div class="detail-section" style="display:flex; gap: 20px; flex-wrap: wrap;">
+            <a href="${esc(safeUrl(law.source_url))}" target="_blank" rel="noopener noreferrer" style="color: #7a5c1e; text-decoration: underline; font-size: 13.5px; font-weight: 600;">Official Gazette text</a>
+            <a href="flashcard.html?law=${law.id}" style="color: #7a5c1e; text-decoration: underline; font-size: 13.5px; font-weight: 600;">Study this as a flashcard</a>
           </div>
 
           <hr style="border: 0; border-top: 1px solid var(--line); margin: 25px 0;">
-
-          <h3 style="font-family: 'Playfair Display', serif; font-size: 18px; margin-bottom: 12px;">Community Notes & Tips</h3>
-          <div id="commentsList">
-            ${law.user_notes.length > 0 
-              ? law.user_notes.map((n, i) => `
-                  <div class="comment-bubble" data-index="${i}">
-                    <span><strong>${n.user_name}:</strong>${n.comment}</span>
-                    <button class="delete-comment-btn">Delete</button>
-                  </div>
-                `).join('') 
-              : '<p style="color: #7b858d; font-size: 13px; margin-bottom: 12px;">No notes yet. Be the first to post a study tip!</p>'}
-          </div>
-
+          <h3 style="font-family: 'Playfair Display', serif; font-size: 18px; margin-bottom: 4px;">Student notes</h3>
+          <p style="font-size: 12px; color: #7b858d; margin-bottom: 12px;">Shared with L-Lawliet. Notes posted on either site show up on both.</p>
+          <div id="commentsList">${notesHtml(law)}</div>
+          ${auth ? `
           <div class="comment-form" style="margin-top: 15px;">
-            <input type="text" id="userNameInput" placeholder="Your Name (e.g. Juan D.)">
-            <textarea id="userCommentInput" placeholder="Write a note, mnemonic, or study tip..." rows="3"></textarea>
-            <button id="submitCommentBtn">Post Note</button>
-          </div>
+            <label for="userCommentInput" style="font-size: 12.5px; color: #59636d; display:block; margin-bottom: 6px;">Posting as ${esc(displayName())}</label>
+            <textarea id="userCommentInput" maxlength="1000" placeholder="A tip, a mnemonic or a correction" rows="3"></textarea>
+            <button id="submitCommentBtn">Post note</button>
+            <p id="noteError" role="alert" style="color: var(--accent-red); font-size: 12.5px; margin-top: 8px;"></p>
+          </div>` : `
+          <p style="font-size: 13px; margin-top: 10px;"><a href="login.html?next=${encodeURIComponent("browse.html?law=" + law.id)}" style="color: #7a5c1e; text-decoration: underline; font-weight: 600;">Sign in</a> to add a note.</p>`}
         `;
-
         modal.classList.remove("hidden");
+        wireNotes(law);
+    }
 
-        // Delete note
-        modalBody.querySelectorAll(".delete-comment-btn").forEach(btn => {
-          btn.addEventListener("click", (e) => {
-            const bubble = e.target.closest(".comment-bubble");
-            const idx = Number(bubble.dataset.index);
-            law.user_notes.splice(idx, 1);
-            saveNotesToStorage(law.id, law.user_notes);
-            openModal(law);
-          });
+    function wireNotes(law) {
+        const list = $("commentsList");
+        list.querySelectorAll(".edit-note-btn").forEach(btn => btn.addEventListener("click", () => {
+            const bubble = btn.closest(".comment-bubble");
+            const note = law.user_notes.find(n => String(n.id) === bubble.dataset.id);
+            bubble.querySelector(".note-text").outerHTML =
+                `<textarea class="note-edit" maxlength="1000" rows="3" style="width:100%; margin-top:6px; padding:8px; border:1px solid var(--line); font: inherit; font-size: 13px;">${esc(note.comment)}</textarea>
+                 <p class="note-edit-error" style="color: var(--accent-red); font-size: 12px;"></p>`;
+            const save = btn.cloneNode(false);
+            save.textContent = "Save";
+            save.classList.remove("edit-note-btn");
+            btn.replaceWith(save);
+            save.addEventListener("click", async () => {
+                const text = bubble.querySelector(".note-edit").value.trim();
+                if (!text) return;
+                save.disabled = true;
+                try {
+                    const res = await api(`/comments/${note.id}`, { method: "PATCH", body: { comment: text } });
+                    if (!res.ok) { bubble.querySelector(".note-edit-error").textContent = await errorMessage(res); return; }
+                    law.user_notes = (await res.json()).comments;
+                    list.innerHTML = notesHtml(law);
+                    wireNotes(law);
+                } finally {
+                    save.disabled = false;
+                }
+            });
+        }));
+
+        const submit = $("submitCommentBtn");
+        if (!submit || submit.dataset.wired) return;
+        submit.dataset.wired = "1";
+        submit.addEventListener("click", async () => {
+            const text = $("userCommentInput").value.trim();
+            if (!text) return;
+            submit.disabled = true;
+            $("noteError").textContent = "";
+            try {
+                const res = await api(`/laws/${law.id}/comments`, {
+                    method: "POST",
+                    body: { user_name: displayName(), comment: text },
+                });
+                if (!res.ok) { $("noteError").textContent = await errorMessage(res); return; }
+                law.user_notes = (await res.json()).comments;
+                $("userCommentInput").value = "";
+                list.innerHTML = notesHtml(law);
+                wireNotes(law);
+            } catch {
+                $("noteError").textContent = "Could not reach the server. Please try again.";
+            } finally {
+                submit.disabled = false;
+            }
         });
+    }
 
-        // Add note
-        const submitBtn = document.getElementById("submitCommentBtn");
-        submitBtn.addEventListener("click", () => {
-          const nameInput = document.getElementById("userNameInput").value.trim();
-          const commentInput = document.getElementById("userCommentInput").value.trim();
+    const close = () => modal.classList.add("hidden");
+    $("closeModal").addEventListener("click", close);
+    modal.addEventListener("click", e => { if (e.target === modal) close(); });
+    window.addEventListener("keydown", e => { if (e.key === "Escape") close(); });
 
-          if (nameInput && commentInput) {
-            law.user_notes.push({ user_name: nameInput, comment: commentInput });
-            saveNotesToStorage(law.id, law.user_notes);
-            openModal(law);
-          }
-        });
-      }
-
-      function saveNotesToStorage(lawId, notes) {
-        const savedNotes = JSON.parse(localStorage.getItem("juris_law_notes") || "{}");
-        savedNotes[lawId] = notes;
-        localStorage.setItem("juris_law_notes", JSON.stringify(savedNotes));
-      }
-
-      // Close modal
-      if (closeModal) {
-        closeModal.addEventListener("click", () => modal.classList.add("hidden"));
-      }
-      window.addEventListener("click", (e) => {
-        if (e.target === modal) modal.classList.add("hidden");
-      });
-      window.addEventListener("keydown", (e) => {
-        if (e.key === "Escape" && !modal.classList.contains("hidden")) {
-          modal.classList.add("hidden");
-        }
-      });
-
-      // Initial execution
-      fetchLaws();
-    });
-  </script>
+    render();
+    const lawId = Number(params.get("law"));
+    if (lawId) {
+        const law = allLaws.find(l => l.id === lawId);
+        if (law) openModal(law);
+    }
+})();
+</script>
 </body>
 </html>

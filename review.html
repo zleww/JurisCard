@@ -735,6 +735,7 @@ footer {
     }
 }
 </style>
+  <link rel="stylesheet" href="juris.css">
 </head>
 
 <body>
@@ -743,423 +744,145 @@ footer {
 
 <header>
     <div class="container navbar">
-
-        <a href="index.html" class="logo">
-            <span class="logo-symbol">⚖</span>
-            JurisCards
-        </a>
-
-        <nav class="nav-links">
-            <a href="index.html">Home</a>
-            <a href="flashcard.html">Flashcard</a>
-            <a href="review.html" class="active">Review</a>
-        </nav>
-
-        <a href="start-review.html" class="header-button">
-            Start Studying
-        </a>
-
+      <a href="index.html" class="logo"><span class="logo-mark">J</span>JurisCards</a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="browse.html">Browse</a>
+        <a href="flashcard.html">Flashcards</a>
+        <a href="review.html" class="active">Review</a>
+      </nav>
+      <div class="header-end">
+        <a href="start-review.html" class="header-button">Start studying</a>
+        <div class="jc-account" data-account></div>
+      </div>
     </div>
-</header>
+  </header>
 
 
 <main>
 
-    <!-- PAGE HEADING -->
-
     <section class="container page-heading">
-
-        <div class="eyebrow">Your Study Workspace</div>
-
-        <h1>Review &amp; Retain.</h1>
-
+        <div class="eyebrow">Your progress</div>
+        <h1>Review</h1>
         <p>
-            Revisit important legal concepts, strengthen your understanding,
-            and keep your study materials organized.
+            Cards you marked for review, how far along you are in each category,
+            and your quiz results. Everything here is saved to your account.
         </p>
-
     </section>
 
+    <!-- Shown to guests -->
+    <div class="container" id="guestView" hidden>
+        <section class="continue-card">
+            <div class="continue-content">
+                <div class="eyebrow">Guest access</div>
+                <h2>Sign in to track your progress</h2>
+                <p>
+                    As a guest you can read 10 laws, flip their flashcards and take
+                    5-question quizzes, but nothing is saved when you close the tab.
+                    With a free account you get every law in the database, your own
+                    cards, saved marks and a quiz history.
+                </p>
+                <div class="continue-meta">
+                    <span>Same account as L-Lawliet</span>
+                </div>
+                <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                    <a href="login.html?next=review.html" class="primary-button">Sign in</a>
+                    <a href="login.html?signup=1&next=review.html" class="primary-button" style="background:transparent; color:var(--gold-light); border:1px solid var(--gold);">Create account</a>
+                </div>
+            </div>
+        </section>
+    </div>
 
-    <div class="container">
-
-        <!-- SUMMARY CARDS -->
+    <!-- Shown when signed in -->
+    <div class="container" id="userView" hidden>
 
         <section class="summary-grid">
-
             <article class="summary-card">
-                <div class="summary-label">Due for Review</div>
-                <div class="summary-value">45</div>
-                <div class="summary-note">Across all subjects</div>
+                <div class="summary-label">Marked for review</div>
+                <div class="summary-value" id="sumReview">0</div>
+                <div class="summary-note">Laws and your own cards</div>
             </article>
-
             <article class="summary-card">
-                <div class="summary-label">Reviewed Today</div>
-                <div class="summary-value">28</div>
-                <div class="summary-note">Cards completed</div>
+                <div class="summary-label">Marked today</div>
+                <div class="summary-value" id="sumToday">0</div>
+                <div class="summary-note" id="sumTodayNote">Daily goal</div>
             </article>
-
             <article class="summary-card">
-                <div class="summary-label">Overall Mastery</div>
-                <div class="summary-value">68%</div>
-                <div class="summary-note gold-text">Across your collection</div>
+                <div class="summary-label">Mastered</div>
+                <div class="summary-value" id="sumMastery">0%</div>
+                <div class="summary-note gold-text" id="sumMasteryNote"></div>
             </article>
-
             <article class="summary-card">
-                <div class="summary-label">Study Time</div>
-                <div class="summary-value">42m</div>
-                <div class="summary-note">Today's total</div>
+                <div class="summary-label">Quizzes taken</div>
+                <div class="summary-value" id="sumQuizzes">0</div>
+                <div class="summary-note" id="sumQuizNote">None yet</div>
             </article>
-
         </section>
 
-
-        <!-- MAIN REVIEW LAYOUT -->
-
         <section class="review-layout">
-
             <div class="left-column">
 
-                <!-- CONTINUE REVIEW -->
-
                 <section class="continue-card">
-
                     <div class="continue-content">
-
-                        <div class="eyebrow">Recommended Session</div>
-
-                        <h2>Continue Your Review</h2>
-
-                        <p>
-                            Pick up where you left off and work through
-                            your remaining review cards.
-                        </p>
-
-                        <div class="continue-meta">
-                            <span>45 cards due</span>
-                            <span>~25 minutes</span>
-                            <span>6 subjects</span>
-                        </div>
-
-                        <a href="flashcard.html" class="primary-button">
-                            Begin Review <span>→</span>
-                        </a>
-
+                        <div class="eyebrow">Next session</div>
+                        <h2 id="nextTitle">Loading</h2>
+                        <p id="nextText"></p>
+                        <div class="continue-meta" id="nextMeta"></div>
+                        <a href="flashcard.html" class="primary-button" id="nextBtn">Open flashcards</a>
                     </div>
-
                 </section>
 
-
-                <!-- SUBJECTS -->
-
                 <section>
-
                     <div class="section-heading">
                         <div>
-                            <h2>Review by Subject</h2>
-                            <p>Choose a subject to continue studying.</p>
+                            <h2>By category</h2>
+                            <p>Laws in each category plus the cards you wrote yourself.</p>
                         </div>
                     </div>
 
                     <div class="filters">
-
-                        <button class="filter-button active"
-                                data-filter="all">
-                            All Subjects
-                        </button>
-
-                        <button class="filter-button"
-                                data-filter="due">
-                            Due Today
-                        </button>
-
-                        <button class="filter-button"
-                                data-filter="completed">
-                            Completed
-                        </button>
-
-                        <select id="sortSelect" aria-label="Sort subjects">
-                            <option value="due">Sort: Most Due</option>
-                            <option value="name">Sort: A–Z</option>
-                            <option value="mastery">Sort: Lowest Mastery</option>
+                        <button class="filter-button active" data-filter="all">All</button>
+                        <button class="filter-button" data-filter="due">Marked for review</button>
+                        <button class="filter-button" data-filter="completed">Fully mastered</button>
+                        <select id="sortSelect" aria-label="Sort categories">
+                            <option value="due">Sort: most marked</option>
+                            <option value="name">Sort: A to Z</option>
+                            <option value="mastery">Sort: lowest mastery</option>
                         </select>
-
                     </div>
 
-
-                    <div class="subject-list" id="subjectList">
-
-                        <!-- TORT LAW -->
-
-                        <article class="subject-card"
-                                 data-name="Tort Law"
-                                 data-due="12"
-                                 data-mastery="68">
-
-                            <div>
-                                <div class="subject-top">
-                                    <div class="subject-icon">§</div>
-                                    <div>
-                                        <div class="subject-category">Civil Law</div>
-                                        <h3>Tort Law</h3>
-                                    </div>
-                                </div>
-
-                                <p class="subject-description">
-                                    Quasi-delicts, negligence, and civil liability.
-                                </p>
-
-                                <div class="progress-row">
-                                    <div class="progress-track">
-                                        <div class="progress-fill"
-                                             style="width:68%"></div>
-                                    </div>
-                                    <span>68% mastered</span>
-                                </div>
-                            </div>
-
-                            <div class="subject-action">
-                                <div class="due-count">
-                                    <strong>12</strong>
-                                    <span>Cards due</span>
-                                </div>
-                                <button class="secondary-button"
-                                        onclick="startSubject('Tort Law')">
-                                    Review →
-                                </button>
-                            </div>
-
-                        </article>
-
-
-                        <!-- CRIMINAL LAW -->
-
-                        <article class="subject-card"
-                                 data-name="Criminal Law"
-                                 data-due="8"
-                                 data-mastery="74">
-
-                            <div>
-                                <div class="subject-top">
-                                    <div class="subject-icon">⚖</div>
-                                    <div>
-                                        <div class="subject-category">Criminal Law</div>
-                                        <h3>Criminal Law</h3>
-                                    </div>
-                                </div>
-
-                                <p class="subject-description">
-                                    Criminal liability, felonies, and penalties.
-                                </p>
-
-                                <div class="progress-row">
-                                    <div class="progress-track">
-                                        <div class="progress-fill"
-                                             style="width:74%"></div>
-                                    </div>
-                                    <span>74% mastered</span>
-                                </div>
-                            </div>
-
-                            <div class="subject-action">
-                                <div class="due-count">
-                                    <strong>8</strong>
-                                    <span>Cards due</span>
-                                </div>
-                                <button class="secondary-button"
-                                        onclick="startSubject('Criminal Law')">
-                                    Review →
-                                </button>
-                            </div>
-
-                        </article>
-
-
-                        <!-- CONSTITUTIONAL LAW -->
-
-                        <article class="subject-card"
-                                 data-name="Constitutional Law"
-                                 data-due="10"
-                                 data-mastery="49">
-
-                            <div>
-                                <div class="subject-top">
-                                    <div class="subject-icon">§</div>
-                                    <div>
-                                        <div class="subject-category">Public Law</div>
-                                        <h3>Constitutional Law</h3>
-                                    </div>
-                                </div>
-
-                                <p class="subject-description">
-                                    Constitutional rights, state powers,
-                                    and government structure.
-                                </p>
-
-                                <div class="progress-row">
-                                    <div class="progress-track">
-                                        <div class="progress-fill"
-                                             style="width:49%"></div>
-                                    </div>
-                                    <span>49% mastered</span>
-                                </div>
-                            </div>
-
-                            <div class="subject-action">
-                                <div class="due-count">
-                                    <strong>10</strong>
-                                    <span>Cards due</span>
-                                </div>
-                                <button class="secondary-button"
-                                        onclick="startSubject('Constitutional Law')">
-                                    Review →
-                                </button>
-                            </div>
-
-                        </article>
-
-
-                        <!-- CONTRACTS -->
-
-                        <article class="subject-card"
-                                 data-name="Contracts"
-                                 data-due="0"
-                                 data-mastery="63">
-
-                            <div>
-                                <div class="subject-top">
-                                    <div class="subject-icon">¶</div>
-                                    <div>
-                                        <div class="subject-category">Civil Law</div>
-                                        <h3>Contracts</h3>
-                                    </div>
-                                </div>
-
-                                <p class="subject-description">
-                                    Obligations, consent, validity,
-                                    and contract interpretation.
-                                </p>
-
-                                <div class="progress-row">
-                                    <div class="progress-track">
-                                        <div class="progress-fill"
-                                             style="width:63%"></div>
-                                    </div>
-                                    <span>63% mastered</span>
-                                </div>
-                            </div>
-
-                            <div class="subject-action">
-                                <div class="due-count">
-                                    <strong>0</strong>
-                                    <span>Cards due</span>
-                                </div>
-                                <button class="secondary-button"
-                                        onclick="startSubject('Contracts')">
-                                    Review →
-                                </button>
-                            </div>
-
-                        </article>
-
-                    </div>
-
+                    <div class="subject-list" id="subjectList"></div>
                 </section>
-
             </div>
 
-
-            <!-- RIGHT COLUMN -->
-
             <aside class="right-column">
-
-                <!-- DAILY PROGRESS -->
-
                 <section class="side-panel">
-
-                    <h2>Today's Progress</h2>
-
+                    <h2>Today</h2>
                     <div class="daily-progress">
-
-                        <div class="progress-circle">
-                            <div class="progress-circle-inner">
-                                62%
-                            </div>
+                        <div class="progress-circle" id="todayRing">
+                            <div class="progress-circle-inner" id="todayPct">0%</div>
                         </div>
-
                         <div>
-                            <strong>28 / 45</strong>
-                            <p>Cards reviewed today</p>
+                            <strong id="todayCount">0 / 10</strong>
+                            <p>Cards marked today</p>
                         </div>
-
                     </div>
-
-                    <div class="side-track">
-                        <div></div>
-                    </div>
-
-                    <p class="panel-note">
-                        17 cards remaining to complete today's review.
-                    </p>
-
+                    <div class="side-track"><div id="todayBar" style="width:0%"></div></div>
+                    <p class="panel-note" id="todayNote"></p>
                 </section>
-
-
-                <!-- RECENT ACTIVITY -->
 
                 <section class="side-panel">
-
-                    <h2>Recent Activity</h2>
-
-                    <div class="activity-item">
-                        <div class="activity-symbol">✓</div>
-                        <div>
-                            <h3>Tort Law</h3>
-                            <p>12 cards reviewed · 2 hours ago</p>
-                        </div>
-                    </div>
-
-                    <div class="activity-item">
-                        <div class="activity-symbol">✓</div>
-                        <div>
-                            <h3>Criminal Law</h3>
-                            <p>8 cards reviewed · 5 hours ago</p>
-                        </div>
-                    </div>
-
-                    <div class="activity-item">
-                        <div class="activity-symbol">✓</div>
-                        <div>
-                            <h3>Constitutional Law</h3>
-                            <p>15 cards reviewed · Yesterday</p>
-                        </div>
-                    </div>
-
+                    <h2>Recent activity</h2>
+                    <div id="recentList"><p class="panel-note">Nothing yet.</p></div>
                 </section>
 
-
-                <!-- STUDY TIP -->
-
-                <section class="tip-panel">
-
-                    <div class="eyebrow">Study Method</div>
-
-                    <h2>Consistency builds retention.</h2>
-
-                    <p>
-                        Short, regular review sessions can help you
-                        revisit difficult concepts and reinforce
-                        what you have already learned.
-                    </p>
-
+                <section class="side-panel">
+                    <h2>Quiz history</h2>
+                    <div id="quizList"><p class="panel-note">No quizzes yet.</p></div>
                 </section>
-
             </aside>
-
         </section>
-
     </div>
-
 </main>
 
 
@@ -1167,96 +890,187 @@ footer {
 
 <footer>
     <div class="container footer-content">
-
-        <div class="footer-logo">
-            <span>⚖</span> JurisCards
-        </div>
-
-        <div class="copyright">
-            © 2026 JurisCards. Philippine Law Study Platform.
-        </div>
-
+      <div class="footer-logo"><span class="logo-mark">J</span> JurisCards</div>
+      <div class="copyright">Law data from the L-Lawliet database &middot; &copy; 2026 JurisCards</div>
     </div>
-</footer>
+  </footer>
+  <script src="juris.js"></script>
 
 
 <script>
+(async function () {
+    const { getAuth, getJson, esc, timeAgo } = Juris;
 
-// FILTER SUBJECTS
+    if (!getAuth()) {
+        document.getElementById("guestView").hidden = false;
+        return;
+    }
+    document.getElementById("userView").hidden = false;
 
-const filterButtons = document.querySelectorAll(".filter-button");
-const subjectList = document.getElementById("subjectList");
-const sortSelect = document.getElementById("sortSelect");
+    let summary;
+    let quizzes = [];
+    try {
+        [summary, { attempts: quizzes }] = await Promise.all([
+            getJson("/study/summary"),
+            getJson("/study/quizzes?limit=6"),
+        ]);
+    } catch (err) {
+        document.getElementById("nextTitle").textContent = "Could not load your progress";
+        document.getElementById("nextText").textContent = err.message;
+        document.getElementById("nextBtn").hidden = true;
+        return;
+    }
 
-let currentFilter = "all";
-
-function updateSubjects() {
-    const subjects = Array.from(
-        subjectList.querySelectorAll(".subject-card")
-    );
-
-    subjects.forEach(subject => {
-        const due = Number(subject.dataset.due);
-
-        if (currentFilter === "due") {
-            subject.style.display = due > 0 ? "grid" : "none";
-        } else if (currentFilter === "completed") {
-            subject.style.display = due === 0 ? "grid" : "none";
-        } else {
-            subject.style.display = "grid";
-        }
+    // ---------- Totals ----------
+    const cats = summary.categories.map(c => {
+        const total = c.laws + c.cards;
+        const mastered = c.laws_mastered + c.cards_mastered;
+        const review = c.laws_review + c.cards_review;
+        return { ...c, total, mastered, review, pct: total ? Math.round(mastered / total * 100) : 0 };
     });
+    const total = cats.reduce((n, c) => n + c.total, 0);
+    const mastered = cats.reduce((n, c) => n + c.mastered, 0);
+    const review = cats.reduce((n, c) => n + c.review, 0);
+    const untouched = total - mastered - review;
+    const goal = summary.prefs.daily_goal;
+    const today = summary.marked_today;
 
-    const visibleSubjects = subjects.filter(subject =>
-        subject.style.display !== "none"
-    );
+    document.getElementById("sumReview").textContent = review;
+    document.getElementById("sumToday").textContent = today;
+    document.getElementById("sumTodayNote").textContent = `Daily goal: ${goal}`;
+    document.getElementById("sumMastery").textContent = `${total ? Math.round(mastered / total * 100) : 0}%`;
+    document.getElementById("sumMasteryNote").textContent = `${mastered} of ${total} cards`;
+    document.getElementById("sumQuizzes").textContent = summary.quizzes.attempts;
+    document.getElementById("sumQuizNote").textContent = summary.quizzes.attempts
+        ? `Average ${summary.quizzes.average_pct}%, best ${summary.quizzes.best_pct}%`
+        : "None yet";
 
-    const sortMode = sortSelect.value;
+    // ---------- Next session ----------
+    const title = document.getElementById("nextTitle");
+    const text = document.getElementById("nextText");
+    const meta = document.getElementById("nextMeta");
+    const btn = document.getElementById("nextBtn");
+    if (review > 0) {
+        const where = cats.filter(c => c.review > 0).length;
+        title.textContent = `Go over the ${review} card${review === 1 ? "" : "s"} you marked`;
+        text.textContent = "These are the cards you said you need to see again.";
+        meta.innerHTML = `<span>${review} marked for review</span><span>${where} categor${where === 1 ? "y" : "ies"}</span>`;
+        btn.href = "flashcard.html?show=review";
+        btn.textContent = "Review marked cards";
+    } else if (untouched > 0) {
+        title.textContent = `${untouched} card${untouched === 1 ? "" : "s"} you have not studied yet`;
+        text.textContent = "Flip through them and mark each one as mastered or for review.";
+        meta.innerHTML = `<span>${untouched} not studied</span><span>${mastered} mastered</span>`;
+        btn.href = "flashcard.html?show=new";
+        btn.textContent = "Study new cards";
+    } else {
+        title.textContent = "Every card is mastered";
+        text.textContent = "Test yourself with a practice quiz to keep it fresh.";
+        meta.innerHTML = `<span>${mastered} mastered</span>`;
+        btn.href = "start-review.html#quiz";
+        btn.textContent = "Take a quiz";
+    }
 
-    visibleSubjects.sort((a, b) => {
-        if (sortMode === "name") {
-            return a.dataset.name.localeCompare(b.dataset.name);
-        }
+    // ---------- Categories ----------
+    const list = document.getElementById("subjectList");
+    const initials = name => name.split(/\s+/).filter(w => /^[A-Z]/.test(w)).map(w => w[0]).join("").slice(0, 2);
+    list.innerHTML = cats.map(c => `
+        <article class="subject-card" data-name="${esc(c.category)}" data-due="${c.review}"
+                 data-mastery="${c.pct}" data-done="${c.total > 0 && c.mastered === c.total ? 1 : 0}">
+            <div>
+                <div class="subject-top">
+                    <div class="subject-icon">${esc(initials(c.category))}</div>
+                    <div>
+                        <div class="subject-category">${c.laws} law${c.laws === 1 ? "" : "s"}${c.cards ? ` + ${c.cards} of your cards` : ""}</div>
+                        <h3>${esc(c.category)}</h3>
+                    </div>
+                </div>
+                <div class="progress-row">
+                    <div class="progress-track"><div class="progress-fill" style="width:${c.pct}%"></div></div>
+                    <span>${c.pct}% mastered</span>
+                </div>
+            </div>
+            <div class="subject-action">
+                <div class="due-count">
+                    <strong>${c.review}</strong>
+                    <span>Marked</span>
+                </div>
+                <a class="secondary-button" href="flashcard.html?subject=${encodeURIComponent(c.category)}">Study</a>
+            </div>
+        </article>`).join("") || '<p class="panel-note">No laws in the database yet.</p>';
 
-        if (sortMode === "mastery") {
-            return Number(a.dataset.mastery) -
-                   Number(b.dataset.mastery);
-        }
-
-        return Number(b.dataset.due) -
-               Number(a.dataset.due);
+    let currentFilter = "all";
+    const sortSelect = document.getElementById("sortSelect");
+    function updateSubjects() {
+        const cards = Array.from(list.querySelectorAll(".subject-card"));
+        cards.forEach(card => {
+            const show = currentFilter === "all"
+                || (currentFilter === "due" && Number(card.dataset.due) > 0)
+                || (currentFilter === "completed" && card.dataset.done === "1");
+            card.style.display = show ? "grid" : "none";
+        });
+        const mode = sortSelect.value;
+        cards.sort((a, b) => {
+            if (mode === "name") return a.dataset.name.localeCompare(b.dataset.name);
+            if (mode === "mastery") return Number(a.dataset.mastery) - Number(b.dataset.mastery);
+            return Number(b.dataset.due) - Number(a.dataset.due);
+        }).forEach(card => list.appendChild(card));
+    }
+    document.querySelectorAll(".filter-button").forEach(button => {
+        button.addEventListener("click", () => {
+            document.querySelectorAll(".filter-button").forEach(b => b.classList.remove("active"));
+            button.classList.add("active");
+            currentFilter = button.dataset.filter;
+            updateSubjects();
+        });
     });
+    sortSelect.addEventListener("change", updateSubjects);
+    updateSubjects();
 
-    visibleSubjects.forEach(subject => {
-        subjectList.appendChild(subject);
-    });
-}
+    // ---------- Today ----------
+    const pct = Math.min(100, Math.round(today / goal * 100));
+    const deg = Math.round(pct * 3.6);
+    document.getElementById("todayRing").style.background =
+        `conic-gradient(#245a46 0deg ${deg}deg, #e6e5df ${deg}deg 360deg)`;
+    document.getElementById("todayPct").textContent = `${pct}%`;
+    document.getElementById("todayCount").textContent = `${today} / ${goal}`;
+    document.getElementById("todayBar").style.width = `${pct}%`;
+    document.getElementById("todayNote").textContent = today >= goal
+        ? "Daily goal reached."
+        : `${goal - today} more to reach your daily goal. You can change the goal in Settings.`;
 
-filterButtons.forEach(button => {
-    button.addEventListener("click", () => {
-        filterButtons.forEach(btn =>
-            btn.classList.remove("active")
-        );
+    // ---------- Recent activity ----------
+    const describe = item => {
+        if (item.kind === "quiz") return ["Practice quiz", `Scored ${item.detail}${item.category ? " in " + item.category : ""}`];
+        if (item.kind === "card") return ["New card", item.subtitle];
+        return [`${item.title}`, `Marked ${item.detail === "mastered" ? "mastered" : "for review"}`];
+    };
+    if (summary.recent.length) {
+        document.getElementById("recentList").innerHTML = summary.recent.map(item => {
+            const [head, line] = describe(item);
+            return `
+            <div class="activity-item">
+                <div class="activity-symbol">${item.kind === "quiz" ? "Q" : item.kind === "card" ? "+" : item.detail === "mastered" ? "M" : "R"}</div>
+                <div>
+                    <h3>${esc(head)}</h3>
+                    <p>${esc(line)} &middot; ${esc(timeAgo(item.at))}</p>
+                </div>
+            </div>`;
+        }).join("");
+    }
 
-        button.classList.add("active");
-        currentFilter = button.dataset.filter;
-
-        updateSubjects();
-    });
-});
-
-sortSelect.addEventListener("change", updateSubjects);
-
-
-// SUBJECT REVIEW NAVIGATION
-
-function startSubject(subjectName) {
-    // Pass the selected subject to the flashcard page.
-    window.location.href =
-        "flashcard.html?subject=" +
-        encodeURIComponent(subjectName);
-}
-
+    // ---------- Quiz history ----------
+    if (quizzes.length) {
+        document.getElementById("quizList").innerHTML = quizzes.map(q => `
+            <div class="activity-item">
+                <div class="activity-symbol">${Math.round(q.score / q.total * 100)}</div>
+                <div>
+                    <h3>${q.score} of ${q.total} correct</h3>
+                    <p>${esc(q.category || "All categories")} &middot; ${esc(timeAgo(q.taken_at))}</p>
+                </div>
+            </div>`).join("");
+    }
+})();
 </script>
 
 </body>
