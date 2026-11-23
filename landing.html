@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <script>try { if (sessionStorage.getItem("juriscard_auth")) location.replace("index.html"); } catch (e) {}</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>JurisCards · Flashcards for Philippine law</title>
   <meta name="description" content="Flashcards and practice quizzes on Philippine Republic Acts. Mark what you know, review what you missed, and keep your progress. Free for law students.">
@@ -185,7 +186,8 @@
       <nav aria-label="Main">
         <a class="hide-sm" href="#features">Features</a>
         <a class="hide-sm" href="#plans">Guest or account</a>
-        <a href="flashcard.html">Try it</a>
+        <a class="hide-sm" href="flashcard.html">Try it</a>
+        <a href="login.html">Log in</a>
         <a class="btn btn-gold" href="login.html?signup=1">Sign up free</a>
       </nav>
     </div>
@@ -335,7 +337,7 @@
   <footer>
     <div class="wrap">
       <span>JurisCards · Laws from the L-Lawliet database. A study aid, not legal advice.</span>
-      <span><a href="index.html">Home</a> · <a href="https://l-lawliet-three.vercel.app/landing.html">L-Lawliet</a> · <a href="https://just-give-up-atp.vercel.app/landing.html">Arena</a></span>
+      <span><a href="flashcard.html">Flashcards</a> · <a href="https://l-lawliet-three.vercel.app/landing.html">L-Lawliet</a> · <a href="https://just-give-up-atp.vercel.app/landing.html">Arena</a></span>
     </div>
   </footer>
 
