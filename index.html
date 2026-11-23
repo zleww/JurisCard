@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-  <script>try { if (!sessionStorage.getItem("juriscard_auth")) location.replace("landing.html"); } catch (e) {}</script>
+  <script>try { if (/[?&]guest=1/.test(location.search)) sessionStorage.setItem("juriscard_guest", "1"); if (!sessionStorage.getItem("juriscard_auth") && !sessionStorage.getItem("juriscard_guest")) location.replace("landing.html"); } catch (e) {}</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>JurisCards | Philippine Law Study Platform</title>

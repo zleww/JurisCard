@@ -117,7 +117,7 @@
           <p class="jc-msg err" id="googleError" role="alert" style="text-align: center;"></p>
         </div>
 
-        <a class="guest-link" id="guestLink" href="flashcard.html">Continue as a guest</a>
+        <a class="guest-link" id="guestLink" href="index.html?guest=1">Continue as a guest</a>
       </section>
     </div>
   </main>
@@ -140,7 +140,7 @@
       const nextParam = params.get("next") || "";
       const next = /^[a-z-]+\.html(\?[^#]*)?(#[a-z]+)?$/i.test(nextParam) && !nextParam.startsWith("login.html")
           ? nextParam : "index.html";
-      $("guestLink").href = next === "index.html" ? "flashcard.html" : next;
+      $("guestLink").href = next === "index.html" ? "index.html?guest=1" : next;
 
       function done(data) {
           saveSession(data);
