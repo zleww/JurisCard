@@ -124,7 +124,11 @@
 .jc-guest-actions { display: flex; gap: 16px; }
 .jc-guest-actions a { color: #7a5c1e; font-weight: 600; text-decoration: underline; }
 
-@media (max-width: 520px) {
+.header-end > a { white-space: nowrap; }
+.logo { margin-right: 24px; white-space: nowrap; }
+.nav-links a { white-space: nowrap; }
+
+@media (max-width: 960px) {
   .header-end > a.header-btn,
   .header-end > a.header-button { display: none; }
 }
