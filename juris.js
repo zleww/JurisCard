@@ -201,6 +201,46 @@
     });
   }
 
+  // ---------------------------------------------------------------
+  // Phone menu: the page links move into a panel behind a menu button.
+  // ---------------------------------------------------------------
+  function renderMobileNav() {
+    const header = document.querySelector("header");
+    const bar = header && header.querySelector(".navbar");
+    const nav = bar && bar.querySelector(".nav-links");
+    if (!nav || bar.querySelector(".jc-burger")) return;
+
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "jc-burger";
+    btn.setAttribute("aria-label", "Open menu");
+    btn.setAttribute("aria-expanded", "false");
+    btn.innerHTML = "<span></span><span></span><span></span>";
+
+    const panel = document.createElement("nav");
+    panel.className = "jc-mobile-nav";
+    panel.setAttribute("aria-label", "Pages");
+    panel.hidden = true;
+    const links = [...nav.querySelectorAll("a")].map((a) =>
+      `<a href="${esc(a.getAttribute("href"))}"${a.classList.contains("active") ? ' class="active" aria-current="page"' : ""}>${esc(a.textContent.trim())}</a>`);
+    links.push('<a href="start-review.html">Start studying</a>');
+    panel.innerHTML = links.join("");
+
+    (bar.querySelector(".header-end") || bar).appendChild(btn);
+    header.appendChild(panel);
+
+    const set = (open) => {
+      panel.hidden = !open;
+      btn.setAttribute("aria-expanded", String(open));
+      btn.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+      btn.classList.toggle("open", open);
+    };
+    btn.addEventListener("click", (e) => { e.stopPropagation(); set(panel.hidden); });
+    document.addEventListener("click", (e) => { if (!header.contains(e.target)) set(false); });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") set(false); });
+    window.addEventListener("resize", () => { if (window.innerWidth > 840) set(false); });
+  }
+
   window.Juris = {
     API, GUEST, CATEGORIES,
     getAuth, saveSession, updateUser, signOut, isAdmin, displayName, requireLogin,
@@ -208,9 +248,10 @@
     esc, safeUrl, peso, timeAgo, shuffle,
   };
 
+  const start = () => { renderAccount(); renderMobileNav(); };
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", renderAccount);
+    document.addEventListener("DOMContentLoaded", start);
   } else {
-    renderAccount();
+    start();
   }
 })();
