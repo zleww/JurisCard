@@ -16,6 +16,14 @@
   line-height: 1;
 }
 
+.logo-icon {
+  display: block;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+}
+footer .logo-icon { width: 28px; height: 28px; }
+
 .header-end {
   display: flex;
   align-items: center;
