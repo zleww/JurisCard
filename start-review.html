@@ -641,6 +641,7 @@
         <a href="browse.html">Browse</a>
         <a href="flashcard.html">Flashcards</a>
         <a href="review.html">Review</a>
+        <a href="start-review.html#quiz">Quiz</a>
       </nav>
       <div class="header-end">
         <a href="start-review.html" class="header-btn">Start studying</a>
@@ -1010,10 +1011,29 @@
 
     $("openQuizBtn").addEventListener("click", openQuiz);
     $("openQuizBtn").addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openQuiz(); } });
-    $("closeQuizBtn").addEventListener("click", () => modal.classList.add("hidden"));
-    modal.addEventListener("click", e => { if (e.target === modal) modal.classList.add("hidden"); });
-    document.addEventListener("keydown", e => { if (e.key === "Escape") modal.classList.add("hidden"); });
-    if (location.hash === "#quiz") openQuiz();
+    // Closing drops #quiz from the address, so the Quiz link can open it again.
+    function closeQuiz() {
+        modal.classList.add("hidden");
+        if (location.hash === "#quiz") {
+            history.replaceState(null, "", location.pathname + location.search);
+            if (typeof quizFromHash === "function") quizFromHash();
+        }
+    }
+    $("closeQuizBtn").addEventListener("click", closeQuiz);
+    modal.addEventListener("click", e => { if (e.target === modal) closeQuiz(); });
+    document.addEventListener("keydown", e => { if (e.key === "Escape" && !modal.classList.contains("hidden")) closeQuiz(); });
+    // The header's Quiz link (start-review.html#quiz) opens the quiz, also when already on this page.
+    const quizNav = document.querySelector('.nav-links a[href="start-review.html#quiz"]');
+    function quizFromHash() {
+        const on = location.hash === "#quiz";
+        if (quizNav) {
+            quizNav.classList.toggle("active", on);
+            if (on) quizNav.setAttribute("aria-current", "page"); else quizNav.removeAttribute("aria-current");
+        }
+        if (on && modal.classList.contains("hidden")) openQuiz();
+    }
+    quizFromHash();
+    window.addEventListener("hashchange", quizFromHash);
 
     $("quizStartBtn").addEventListener("click", () => {
         quizCategory = $("quizCategory").value || null;
