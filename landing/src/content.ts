@@ -116,7 +116,7 @@ export const site: SiteContent = {
     { q: "What can I do without an account?", a: "Guests get 10 laws as flashcards, 5-question practice quizzes and student notes to read, but marks and scores are lost when the tab closes. A free account unlocks every law, quizzes of 5 to 20 questions, saved marks and scores, your own cards, and the Review page with a daily goal." },
     { q: "Where do the laws come from?", a: "From the L-Lawliet database, the same one L-Lawliet reads from. When a law is added there, it shows up here as a new card. The cards are a study aid, not legal advice." },
     { q: "Does my account work on L-Lawliet and the Arena?", a: "Yes. The three sites share one database, so the same username and password, or Google sign-in, works on each of them." },
-    { q: "I forgot my password. What now?", a: "Use \"Forgot password?\" on the sign-in page. If you confirmed an email in Settings, we send a reset link that works once, for 30 minutes. If you did not, ask an admin to help you back in." },
+    { q: "I forgot my password. What now?", a: "Use \"Forgot password?\" on the sign-in page. We email a reset link to the address on your account; it works once, for 30 minutes." },
   ],
 
   finalCta: {

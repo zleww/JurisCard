@@ -1,0 +1,21 @@
+/* JurisCards: the site's ink navy, card gold and cream, Playfair Display with DM Sans (juris.css). */
+@theme {
+  --color-bg: #071525;
+  --color-surface: #0c1d30;
+  --color-surface-2: #142333;
+  --color-line: rgb(247 245 239 / 0.08);
+  --color-line-strong: rgb(247 245 239 / 0.15);
+  --color-ink: #f7f5ef;
+  --color-muted: #a7b0ba;        /* 8.4:1 on bg */
+  --color-faint: #7f8a94;        /* 5.2:1 on bg, for small print */
+  --color-accent: #c9a45c;       /* the site's gold: fills, glows */
+  --color-accent-ink: #e0c27d;   /* gold for text on dark */
+  --color-accent-hover: #e0c27d;
+  --color-on-accent: #071525;    /* text on gold: 7.8:1 */
+  --color-accent2: #1b3a5c;      /* navy glow */
+  --color-accent2-ink: #cbd3dc;  /* the site's slate */
+
+  --font-display: "Playfair Display Variable", "Playfair Display", Georgia, serif;
+  --font-sans: "DM Sans Variable", "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --tracking-display: -0.015em;
+}
