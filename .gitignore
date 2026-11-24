@@ -2,3 +2,6 @@
 .vscode/
 __pycache__/
 .env
+
+# Landing page build tools (landing/)
+node_modules/

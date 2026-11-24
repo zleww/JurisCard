@@ -81,6 +81,17 @@
         </div>
 
         <div>
+          <form class="jc-panel" id="emailForm" hidden>
+            <h2>Recovery email</h2>
+            <p class="jc-sub" id="emailSub">Add an email so you can reset your password if you forget it. We send a link to confirm it first.</p>
+            <div class="jc-field">
+              <label for="recoveryEmail">Email</label>
+              <input id="recoveryEmail" type="email" autocomplete="email" required maxlength="254">
+            </div>
+            <button class="jc-btn" type="submit" id="emailBtn">Send confirmation link</button>
+            <p class="jc-msg" id="emailMsg" role="status"></p>
+          </form>
+
           <form class="jc-panel" id="passwordForm">
             <h2>Password</h2>
             <p class="jc-sub" id="passwordSub">Changing it signs you out on every other device.</p>
@@ -192,6 +203,10 @@
       $("hideMastered").checked = prefs.hide_mastered;
       $("deleteUsername").textContent = me.username;
       $("pwUsername").value = me.username;
+      if (!me.google_linked) {
+          $("emailForm").hidden = false;
+          if (me.email) $("emailSub").textContent = `Confirmed: ${me.email}. Password reset links go here. Enter a new address to change it.`;
+      }
       if (!me.has_password) {
           $("passwordSub").textContent = "This account signs in with Google, so it has no password to change.";
           $("passwordFields").hidden = true;
@@ -225,6 +240,17 @@
               method: "PATCH",
               body: { quiz_length: Number($("quizLength").value), daily_goal: goal, hide_mastered: $("hideMastered").checked },
           }, async () => say("studyMsg", "Study settings saved.", true));
+      });
+
+      // ---------- Recovery email: saved once the emailed link is opened ----------
+      $("emailForm").addEventListener("submit", e => {
+          e.preventDefault();
+          const email = $("recoveryEmail").value.trim();
+          if (!email) { say("emailMsg", "Enter an email address.", false); return; }
+          submit($("emailBtn"), "emailMsg", "/me/email", { method: "POST", body: { email } }, async res => {
+              $("emailForm").reset();
+              say("emailMsg", (await res.json()).detail, true);
+          });
       });
 
       // ---------- Password ----------
