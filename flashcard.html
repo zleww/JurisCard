@@ -933,6 +933,39 @@
         };
     }
 
+    // A law drawn at random from L-Lawliet's full list (no plain-English guide): the front
+    // shows its official title, the back names the law.
+    const DRAW_SIZE = 20;
+    function listedCard(law) {
+        const date = law.enacted_on
+            ? new Date(law.enacted_on + "T00:00:00").toLocaleDateString("en-PH", { year: "numeric", month: "long", day: "numeric" })
+            : String(law.year);
+        return {
+            key: `law-${law.id}`, kind: "law", listed: true, id: law.id,
+            category: "Full list",
+            question: "Which law is this?",
+            subtitle: law.official_title,
+            meta: "Drawn from the full list",
+            label: law.label || law.ra_number,
+            source: `Enacted ${date}`,
+            answer: `${law.label || law.ra_number}, enacted ${date}.`,
+            scenario: "", penalties: "",
+            status: "new",
+        };
+    }
+
+    // A fresh random set from the full list; the database picks them, so the page never
+    // downloads all the laws. Returns [] if the draw fails (the deck still has the guides).
+    async function drawListed() {
+        try {
+            const data = await getJson(`/laws/draw?count=${DRAW_SIZE}`);
+            return data.laws.map(listedCard);
+        } catch (err) {
+            console.warn("Could not draw laws from the full list:", err);
+            return [];
+        }
+    }
+
     function ownCard(c) {
         return {
             key: `own-${c.id}`, kind: "own", id: c.id,
@@ -949,15 +982,17 @@
 
     // ---------- Load ----------
     let lawData;
+    let marks = new Map();
     try {
-        const requests = [loadLaws()];
+        const requests = [loadLaws(), drawListed()];
         if (signedIn) requests.push(getJson("/study/progress"), getJson("/study/cards"), getJson("/study/prefs"));
-        const [laws, progress, cards, prefs] = await Promise.all(requests);
+        const [laws, drawn, progress, cards, prefs] = await Promise.all(requests);
         lawData = laws;
-        const marks = new Map((progress ? progress.progress : []).map(p => [p.law_id, p.status]));
+        marks = new Map((progress ? progress.progress : []).map(p => [p.law_id, p.status]));
         allCards = [
             ...(cards ? cards.cards.map(ownCard) : []),
             ...laws.laws.map(l => ({ ...lawCard(l), status: marks.get(l.id) || "new" })),
+            ...drawn.map(c => ({ ...c, status: marks.get(c.id) || "new" })),
         ];
         if (prefs && prefs.hide_mastered) $("showSelect").value = "unmastered";
     } catch (err) {
@@ -968,7 +1003,7 @@
 
     if (!signedIn) {
         $("guestNote").innerHTML = guestNotice(
-            `Guest deck: ${lawData.count} of ${lawData.total} laws. Your marks last until you close this tab.`);
+            `Guest deck: ${lawData.count} of the ${lawData.total} guides, plus ${DRAW_SIZE} laws drawn from the full list. Your marks last until you close this tab.`);
         $("saveBadge").textContent = "Guest";
         $("showSelect").querySelector('option[value="mine"]').remove();
         $("openCreateModalBtn").textContent = "Sign in to write cards";
@@ -1043,7 +1078,7 @@
         $("frontSubtitle").textContent = card.subtitle;
         $("backId").textContent = card.label;
         $("backSource").textContent = card.source;
-        $("backAnswerLabel").textContent = card.kind === "law" ? "What it does" : "Answer";
+        $("backAnswerLabel").textContent = card.listed ? "The law" : card.kind === "law" ? "What it does" : "Answer";
         $("backAnswer").textContent = card.answer;
         $("backScenario").textContent = card.scenario;
         $("backPenalties").textContent = card.penalties;
@@ -1070,6 +1105,7 @@
         const next = card.status === status ? "new" : status; // pressing the same mark again clears it
         const previous = card.status;
         card.status = next;
+        if (card.kind === "law") marks.set(card.id, next);
         renderCard();
         updateProgress();
         $("saveError").textContent = "";
@@ -1106,7 +1142,29 @@
         else if (e.code === "ArrowRight") go(1);
         else if (e.code === "ArrowLeft") go(-1);
     });
-    $("shuffleBtn").addEventListener("click", () => { deck = shuffle(deck); index = 0; renderCard(); });
+    // Shuffle: draw a new set from the full list (cards you marked for review stay), then mix.
+    $("shuffleBtn").addEventListener("click", async () => {
+        const btn = $("shuffleBtn");
+        btn.disabled = true;
+        btn.textContent = "Shuffling…";
+        const fresh = await drawListed();
+        if (fresh.length) {
+            const kept = allCards.filter(c => c.listed && c.status === "review");
+            const keptIds = new Set(kept.map(c => c.id));
+            allCards = [
+                ...allCards.filter(c => !c.listed),
+                ...kept,
+                ...fresh.filter(c => !keptIds.has(c.id)).map(c => ({ ...c, status: marks.get(c.id) || "new" })),
+            ];
+        }
+        filterDeck();
+        deck = shuffle(deck);
+        index = 0;
+        renderCard();
+        updateProgress();
+        btn.disabled = false;
+        btn.textContent = "Shuffle";
+    });
 
     $("searchInput").addEventListener("input", () => filterDeck());
     $("showSelect").addEventListener("change", () => filterDeck());
