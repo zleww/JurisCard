@@ -236,6 +236,7 @@
       btn.classList.toggle("open", open);
     };
     btn.addEventListener("click", (e) => { e.stopPropagation(); set(panel.hidden); });
+    panel.addEventListener("click", (e) => { if (e.target.closest("a")) set(false); }); // e.g. Quiz on its own page
     document.addEventListener("click", (e) => { if (!header.contains(e.target)) set(false); });
     document.addEventListener("keydown", (e) => { if (e.key === "Escape") set(false); });
     window.addEventListener("resize", () => { if (window.innerWidth > 840) set(false); });
